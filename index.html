@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BRG CABS – Reliable Cab Service in Delhi NCR | 24×7 Taxi Service</title>
+<meta name="description" content="BRG CABS offers 24×7 safe, affordable & professional taxi services in Delhi NCR. Airport transfers, outstation cabs, Chardham Yatra, tempo traveller, corporate travel. Call +91 98114 19926."/>
+<meta name="keywords" content="Cab Service in Delhi, Taxi Service in Uttam Nagar, Delhi Airport Taxi, Outstation Cab Delhi, Tempo Traveller Delhi, Best Taxi Service Delhi NCR, Chardham Yatra Taxi"/>
+<meta property="og:title" content="BRG CABS – Reliable Cab Service in Delhi NCR"/>
+<meta property="og:description" content="24×7 Safe, Affordable & Professional Taxi Services. Book Your Ride in Minutes."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://brgcabs.in"/>
+<link rel="canonical" href="https://brgcabs.in"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#F5C518;
+  --gold-dark:#D4A017;
+  --gold-light:#FFF3A3;
+  --black:#0A0A0A;
+  --black2:#111;
+  --dark:#1A1A1A;
+  --dark2:#222;
+  --gray:#888;
+  --light:#F8F8F8;
+  --white:#FFFFFF;
+  --font-head:'Bebas Neue',sans-serif;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --shadow:0 8px 40px rgba(0,0,0,.18);
+  --shadow-gold:0 4px 24px rgba(245,197,24,.35);
+  --radius:12px;
+  --radius-lg:20px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);background:var(--white);color:var(--black);overflow-x:hidden;line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+button{cursor:pointer;border:none;outline:none;font-family:var(--font-body)}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes rotateBg{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ─── HEADER ─── */
+#header{position:fixed;top:0;left:0;width:100%;z-index:1000;transition:all .4s ease;padding:0}
+#header.scrolled{background:rgba(10,10,10,.96);backdrop-filter:blur(16px);box-shadow:0 2px 20px rgba(0,0,0,.4)}
+#header.scrolled .logo-text{color:var(--gold)}
+.header-top{background:var(--gold);padding:6px 20px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;font-weight:600;color:var(--black)}
+.header-top a{color:var(--black)}
+.header-top .ht-left span{margin-right:16px}
+.header-top .ht-right a{margin-left:12px;font-weight:700}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 40px;background:rgba(10,10,10,.85);backdrop-filter:blur(12px)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:46px;height:46px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--black);font-family:var(--font-head);letter-spacing:-1px}
+.logo-text{font-family:var(--font-head);font-size:1.8rem;letter-spacing:2px;color:var(--white);line-height:1}
+.logo-sub{font-size:.62rem;color:var(--gold);letter-spacing:3px;font-weight:600;text-transform:uppercase}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:rgba(255,255,255,.85);font-size:.88rem;font-weight:500;transition:.3s;position:relative;letter-spacing:.5px}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--gold);transition:.3s}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{background:var(--gold);color:var(--black);padding:10px 24px;border-radius:50px;font-weight:700;font-size:.88rem;transition:.3s}
+.nav-cta:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:var(--shadow-gold)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:26px;height:2px;background:var(--white);border-radius:2px;transition:.3s}
+.mobile-menu{display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:var(--black);z-index:999;flex-direction:column;justify-content:center;align-items:center;gap:30px;opacity:0;transition:.4s}
+.mobile-menu.open{opacity:1}
+.mobile-menu a{color:var(--white);font-size:1.5rem;font-family:var(--font-head);letter-spacing:3px;transition:.3s}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-close{position:absolute;top:24px;right:24px;color:var(--white);font-size:2rem;cursor:pointer;background:none;border:none;color:var(--gold)}
+
+/* ─── HERO ─── */
+#hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden;background:var(--black)}
+.hero-bg{position:absolute;inset:0;background:
+  linear-gradient(135deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.6) 50%,rgba(0,0,0,.85) 100%),
+  url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1800&q=80') center/cover no-repeat;z-index:0}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,197,24,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,197,24,.04) 1px,transparent 1px);background-size:60px 60px;z-index:1}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(245,197,24,.15) 0%,transparent 70%);top:50%;left:60%;transform:translate(-50%,-50%);z-index:1;animation:float 6s ease-in-out infinite}
+.hero-content{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:120px 40px 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);color:var(--gold);padding:8px 20px;border-radius:50px;font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;animation:fadeUp .8s ease both}
+.hero-badge::before{content:'●';font-size:.5rem;animation:pulse 2s infinite}
+.hero-h1{font-family:var(--font-head);font-size:clamp(3rem,6vw,5.5rem);line-height:1;color:var(--white);margin-bottom:16px;animation:fadeUp .8s .15s ease both;letter-spacing:1px}
+.hero-h1 span{color:var(--gold);display:block}
+.hero-sub{font-size:1.1rem;color:rgba(255,255,255,.75);margin-bottom:36px;animation:fadeUp .8s .3s ease both;max-width:480px;line-height:1.7}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px;animation:fadeUp .8s .45s ease both}
+.btn-primary{background:var(--gold);color:var(--black);padding:14px 32px;border-radius:50px;font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:.3s;box-shadow:var(--shadow-gold)}
+.btn-primary:hover{background:var(--gold-dark);transform:translateY(-3px);box-shadow:0 8px 32px rgba(245,197,24,.5)}
+.btn-secondary{background:transparent;color:var(--white);padding:14px 32px;border-radius:50px;font-weight:600;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:.3s;border:2px solid rgba(255,255,255,.3)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-3px)}
+.btn-wa{background:#25D366;color:var(--white);padding:14px 28px;border-radius:50px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:8px;transition:.3s}
+.btn-wa:hover{background:#1ebe5d;transform:translateY(-3px);box-shadow:0 8px 32px rgba(37,211,102,.4)}
+.hero-stats{display:flex;gap:32px;margin-top:40px;animation:fadeUp .8s .6s ease both}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-head);font-size:2.4rem;color:var(--gold);line-height:1}
+.stat-label{font-size:.72rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1.5px}
+
+/* Hero booking form */
+.hero-form-wrap{animation:slideRight .9s .3s ease both}
+.hero-form{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-lg);padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.hero-form h3{font-family:var(--font-head);font-size:1.8rem;color:var(--gold);letter-spacing:2px;margin-bottom:20px;text-align:center}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.form-group input,.form-group select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:12px 16px;color:var(--white);font-size:.9rem;font-family:var(--font-body);transition:.3s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold);background:rgba(245,197,24,.08)}
+.form-group select option{background:#111;color:#fff}
+.form-group input::placeholder{color:rgba(255,255,255,.4)}
+.btn-book{width:100%;background:var(--gold);color:var(--black);padding:16px;border-radius:10px;font-weight:800;font-size:1rem;font-family:var(--font-body);letter-spacing:.5px;transition:.3s;margin-top:4px}
+.btn-book:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:var(--shadow-gold)}
+
+/* ─── TICKER ─── */
+.ticker-wrap{background:var(--gold);overflow:hidden;padding:10px 0;position:relative;z-index:10}
+.ticker-track{display:flex;width:max-content;animation:ticker 30s linear infinite}
+.ticker-item{white-space:nowrap;font-family:var(--font-head);font-size:1rem;letter-spacing:2px;color:var(--black);padding:0 40px}
+.ticker-item::before{content:'✦';margin-right:20px}
+
+/* ─── SECTION COMMONS ─── */
+.section{padding:90px 0}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section-badge{display:inline-block;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);color:var(--gold);padding:6px 18px;border-radius:50px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px}
+.section-title{font-family:var(--font-head);font-size:clamp(2.2rem,4vw,3.6rem);line-height:1.05;letter-spacing:1px;margin-bottom:16px}
+.section-sub{color:var(--gray);max-width:580px;font-size:.98rem;line-height:1.8}
+.title-accent{color:var(--gold)}
+.section-header{margin-bottom:56px}
+.section-header.center{text-align:center}
+.section-header.center .section-sub{margin:0 auto}
+
+/* ─── SERVICES ─── */
+#services{background:var(--light)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.service-card{background:var(--white);border-radius:var(--radius-lg);padding:32px 28px;transition:.4s;border:1px solid rgba(0,0,0,.06);position:relative;overflow:hidden;cursor:pointer}
+.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,197,24,0) 0%,rgba(245,197,24,.06) 100%);opacity:0;transition:.4s}
+.service-card:hover::before{opacity:1}
+.service-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(0,0,0,.12);border-color:rgba(245,197,24,.3)}
+.service-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:20px;box-shadow:var(--shadow-gold)}
+.service-card h3{font-family:var(--font-head);font-size:1.4rem;letter-spacing:1px;margin-bottom:10px;color:var(--black)}
+.service-card p{font-size:.88rem;color:var(--gray);line-height:1.7}
+.service-card .service-link{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:.82rem;font-weight:700;margin-top:16px;transition:.3s}
+.service-card:hover .service-link{gap:10px}
+
+/* ─── WHY CHOOSE ─── */
+#why{background:var(--black);position:relative;overflow:hidden}
+#why::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(245,197,24,.06) 0%,transparent 70%);top:-200px;right:-200px}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px}
+.why-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:28px;transition:.4s;display:flex;gap:20px;align-items:flex-start}
+.why-card:hover{background:rgba(245,197,24,.07);border-color:rgba(245,197,24,.25);transform:translateY(-4px)}
+.why-icon{width:52px;height:52px;min-width:52px;background:linear-gradient(135deg,rgba(245,197,24,.2),rgba(245,197,24,.05));border:1px solid rgba(245,197,24,.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+.why-card h4{font-weight:700;font-size:1rem;color:var(--white);margin-bottom:6px}
+.why-card p{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.6}
+#why .section-title{color:var(--white)}
+#why .section-sub{color:rgba(255,255,255,.5)}
+
+/* ─── FLEET ─── */
+#fleet{background:var(--light)}
+.fleet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:28px}
+.fleet-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);transition:.4s;border:1px solid rgba(0,0,0,.05)}
+.fleet-card:hover{transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,0,0,.14)}
+.fleet-img{height:180px;overflow:hidden;position:relative;background:linear-gradient(135deg,#1a1a1a,#2a2a2a)}
+.fleet-img img{width:100%;height:100%;object-fit:cover;transition:.5s}
+.fleet-card:hover .fleet-img img{transform:scale(1.08)}
+.fleet-badge{position:absolute;top:12px;right:12px;background:var(--gold);color:var(--black);padding:4px 12px;border-radius:50px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.fleet-body{padding:20px}
+.fleet-body h3{font-family:var(--font-head);font-size:1.4rem;letter-spacing:1px;margin-bottom:6px}
+.fleet-specs{display:flex;gap:16px;margin:12px 0;flex-wrap:wrap}
+.fleet-spec{display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--gray);font-weight:500}
+.fleet-price{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed rgba(0,0,0,.1);padding-top:14px;margin-top:10px}
+.price-tag{font-family:var(--font-head);font-size:1.5rem;color:var(--gold)}
+.price-label{font-size:.72rem;color:var(--gray)}
+.btn-fleet{background:var(--black);color:var(--gold);padding:8px 20px;border-radius:50px;font-size:.8rem;font-weight:700;transition:.3s}
+.btn-fleet:hover{background:var(--gold);color:var(--black)}
+
+/* ─── ROUTES ─── */
+#routes{background:var(--white)}
+.routes-search{max-width:500px;margin:0 auto 40px;position:relative}
+.routes-search input{width:100%;padding:14px 50px 14px 20px;border:2px solid rgba(0,0,0,.1);border-radius:50px;font-size:.95rem;font-family:var(--font-body);transition:.3s}
+.routes-search input:focus{outline:none;border-color:var(--gold)}
+.routes-search span{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:1.2rem}
+.routes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.route-card{background:var(--light);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px;transition:.3s;border:1px solid transparent;cursor:pointer}
+.route-card:hover{background:var(--black);color:var(--white);transform:translateY(-4px);border-color:var(--gold);box-shadow:var(--shadow)}
+.route-icon{width:42px;height:42px;min-width:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.route-card:hover .route-icon{background:rgba(245,197,24,.2)}
+.route-info strong{display:block;font-size:.88rem;font-weight:700}
+.route-info span{font-size:.75rem;color:var(--gray)}
+.route-card:hover .route-info span{color:rgba(255,255,255,.5)}
+.route-km{margin-left:auto;font-size:.75rem;font-weight:700;color:var(--gold);white-space:nowrap}
+
+/* ─── REVIEWS ─── */
+#reviews{background:var(--black);overflow:hidden}
+#reviews .section-title{color:var(--white)}
+#reviews .section-sub{color:rgba(255,255,255,.5)}
+.reviews-slider{overflow:hidden;position:relative}
+.reviews-track{display:flex;gap:24px;transition:.5s ease;padding:8px 4px}
+.review-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:32px;min-width:340px;max-width:340px;transition:.3s;flex-shrink:0}
+.review-card:hover{background:rgba(245,197,24,.06);border-color:rgba(245,197,24,.2)}
+.review-stars{color:var(--gold);font-size:1.1rem;letter-spacing:2px;margin-bottom:16px}
+.review-text{color:rgba(255,255,255,.75);font-size:.92rem;line-height:1.8;font-style:italic;margin-bottom:24px}
+.review-author{display:flex;align-items:center;gap:14px}
+.review-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--black)}
+.review-author strong{color:var(--white);display:block;font-size:.9rem}
+.review-author span{color:rgba(255,255,255,.4);font-size:.78rem}
+.google-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);padding:4px 12px;border-radius:50px;font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:24px}
+.slider-controls{display:flex;justify-content:center;gap:12px;margin-top:36px}
+.slider-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);font-size:1.2rem;transition:.3s;display:flex;align-items:center;justify-content:center}
+.slider-btn:hover{background:var(--gold);color:var(--black);border-color:var(--gold)}
+.slider-dots{display:flex;gap:8px;align-items:center;margin-top:24px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:.3s;cursor:pointer}
+.dot.active{background:var(--gold);width:24px;border-radius:4px}
+.overall-rating{display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.2);border-radius:var(--radius-lg);padding:32px;margin-bottom:48px}
+.overall-rating .big-num{font-family:var(--font-head);font-size:5rem;color:var(--gold);line-height:1}
+.overall-rating .stars{font-size:1.4rem;color:var(--gold);margin:4px 0}
+.overall-rating p{color:rgba(255,255,255,.5);font-size:.85rem}
+
+/* ─── ABOUT ─── */
+#about{background:var(--white)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.about-img-wrap{position:relative}
+.about-main-img{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/3}
+.about-main-img img{width:100%;height:100%;object-fit:cover}
+.about-accent{position:absolute;bottom:-24px;right:-24px;background:var(--gold);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow-gold)}
+.about-accent .num{font-family:var(--font-head);font-size:2.8rem;color:var(--black);line-height:1}
+.about-accent p{font-size:.78rem;color:var(--black);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.about-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0}
+.about-feat{display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:500}
+.about-feat::before{content:'✓';width:26px;height:26px;min-width:26px;background:var(--gold);color:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem}
+
+/* ─── GALLERY ─── */
+#gallery{background:var(--light)}
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:16px}
+.gallery-item{border-radius:var(--radius);overflow:hidden;position:relative;cursor:pointer}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:.5s}
+.gallery-item:hover img{transform:scale(1.1)}
+.gallery-item::after{content:'🔍';position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:1.8rem;opacity:0;transition:.3s}
+.gallery-item:hover::after{opacity:1}
+.gallery-item.tall{grid-row:span 2}
+.gallery-item.wide{grid-column:span 2}
+
+/* ─── FAQ ─── */
+#faq{background:var(--white)}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}
+.faq-item{border-bottom:1px solid rgba(0,0,0,.08);padding:20px 0;cursor:pointer}
+.faq-question{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:.95rem;gap:16px;user-select:none}
+.faq-icon{width:30px;height:30px;min-width:30px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--black);font-weight:800;transition:.3s}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-answer{font-size:.88rem;color:var(--gray);line-height:1.8;max-height:0;overflow:hidden;transition:.4s}
+.faq-item.open .faq-answer{max-height:200px;padding-top:12px}
+
+/* ─── CONTACT ─── */
+#contact{background:var(--black)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:60px}
+.contact-info{color:var(--white)}
+.contact-info .section-title{color:var(--white)}
+.contact-item{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px}
+.contact-icon{width:48px;height:48px;min-width:48px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.contact-item h4{color:var(--gold);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.contact-item p,.contact-item a{color:rgba(255,255,255,.75);font-size:.95rem}
+.contact-item a:hover{color:var(--gold)}
+.map-wrap{border-radius:var(--radius-lg);overflow:hidden;margin-top:28px;border:1px solid rgba(245,197,24,.15)}
+.contact-form-wrap{background:rgba(255,255,255,.04);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:36px}
+.contact-form-wrap h3{font-family:var(--font-head);font-size:1.8rem;letter-spacing:2px;color:var(--gold);margin-bottom:24px}
+.cf-group{margin-bottom:16px}
+.cf-group label{display:block;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.cf-group input,.cf-group select,.cf-group textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 16px;color:var(--white);font-size:.9rem;font-family:var(--font-body);transition:.3s;resize:none}
+.cf-group input:focus,.cf-group select:focus,.cf-group textarea:focus{outline:none;border-color:var(--gold);background:rgba(245,197,24,.06)}
+.cf-group select option{background:#111}
+.cf-group input::placeholder,.cf-group textarea::placeholder{color:rgba(255,255,255,.35)}
+.btn-send{width:100%;background:var(--gold);color:var(--black);padding:15px;border-radius:10px;font-weight:800;font-size:1rem;font-family:var(--font-body);transition:.3s;margin-top:4px}
+.btn-send:hover{background:var(--gold-dark);transform:translateY(-2px)}
+.social-links{display:flex;gap:14px;margin-top:32px}
+.social-link{width:44px;height:44px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--white);transition:.3s;text-decoration:none}
+.social-link:hover{background:var(--gold);color:var(--black);border-color:var(--gold);transform:translateY(-3px)}
+
+/* ─── PAYMENT ─── */
+#payment{background:var(--light);text-align:center}
+.payment-methods{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:32px}
+.payment-badge{background:var(--white);border:1px solid rgba(0,0,0,.1);border-radius:var(--radius);padding:14px 24px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:.9rem;transition:.3s;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.payment-badge:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow-gold)}
+.payment-badge span{font-size:1.6rem}
+
+/* ─── FOOTER ─── */
+footer{background:#050505;color:rgba(255,255,255,.65);padding:72px 0 0}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:56px}
+.footer-brand .logo{margin-bottom:20px}
+.footer-brand p{font-size:.88rem;line-height:1.8;max-width:280px}
+.footer-cert{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.cert-badge{background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:700;letter-spacing:1px}
+.footer-col h4{color:var(--white);font-weight:700;font-size:.95rem;margin-bottom:18px;position:relative;padding-bottom:10px}
+.footer-col h4::after{content:'';position:absolute;bottom:0;left:0;width:28px;height:2px;background:var(--gold)}
+.footer-col ul li{margin-bottom:10px}
+.footer-col ul li a{font-size:.87rem;transition:.3s;color:rgba(255,255,255,.55)}
+.footer-col ul li a:hover{color:var(--gold);padding-left:6px}
+.footer-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:.87rem}
+.footer-contact-item span:first-child{font-size:1rem;margin-top:2px}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding:24px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;gap:16px}
+.footer-bottom p{font-size:.8rem;color:rgba(255,255,255,.35)}
+.footer-bottom-links{display:flex;gap:20px}
+.footer-bottom-links a{font-size:.8rem;color:rgba(255,255,255,.35);transition:.3s}
+.footer-bottom-links a:hover{color:var(--gold)}
+
+/* ─── FLOATING BUTTONS ─── */
+.float-wrap{position:fixed;bottom:28px;right:24px;z-index:900;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.float-wa{width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 6px 24px rgba(37,211,102,.5);animation:pulse 2.5s infinite;transition:.3s;text-decoration:none}
+.float-wa:hover{transform:scale(1.1)}
+.float-call{width:56px;height:56px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:var(--shadow-gold);animation:pulse 2.5s .5s infinite;transition:.3s;text-decoration:none}
+.float-call:hover{transform:scale(1.1)}
+.float-label{position:absolute;right:68px;background:rgba(0,0,0,.85);color:var(--white);padding:5px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;pointer-events:none;opacity:0;transition:.3s}
+.float-wa:hover .float-label,.float-call:hover .float-label{opacity:1}
+
+/* ─── BACK TO TOP ─── */
+#btt{position:fixed;bottom:28px;left:24px;width:44px;height:44px;background:var(--black);border:1px solid rgba(245,197,24,.3);border-radius:50%;color:var(--gold);font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:900;opacity:0;transition:.4s;pointer-events:none}
+#btt.show{opacity:1;pointer-events:all}
+#btt:hover{background:var(--gold);color:var(--black)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--white);padding:14px 28px;border-radius:50px;font-size:.9rem;font-weight:600;box-shadow:var(--shadow);z-index:9999;opacity:0;transition:.4s;border:1px solid var(--gold);pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .navbar{padding:14px 24px}
+  .nav-links{gap:20px}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .about-accent{right:0;bottom:-16px}
+}
+@media(max-width:768px){
+  .header-top{display:none}
+  .navbar{padding:12px 20px}
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:flex}
+  .hero-content{grid-template-columns:1fr;gap:40px;padding:100px 20px 60px;text-align:center}
+  .hero-btns{justify-content:center}
+  .hero-stats{justify-content:center}
+  .hero-form-wrap{animation:fadeUp .9s .5s ease both}
+  .section{padding:64px 0}
+  .section-title{font-size:2.2rem}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:150px}
+  .gallery-item.tall{grid-row:span 1}
+  .gallery-item.wide{grid-column:span 2}
+  .faq-grid{grid-template-columns:1fr}
+  .routes-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+  .footer-bottom-links{justify-content:center}
+  .form-row{grid-template-columns:1fr}
+  .about-accent{right:0}
+}
+@media(max-width:480px){
+  .hero-h1{font-size:2.6rem}
+  .gallery-grid{grid-template-columns:1fr;grid-auto-rows:200px}
+  .gallery-item.wide{grid-column:span 1}
+  .fleet-grid,.services-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:1fr}
+  .about-features{grid-template-columns:1fr}
+  .reviews-track{flex-direction:column}
+  .review-card{min-width:100%;max-width:100%}
+}
+
+/* ─── PAGE NAV HIGHLIGHT ─── */
+.nav-page-link{display:inline-flex;align-items:center;gap:5px;color:var(--gold);font-size:.78rem;font-weight:700;margin-top:12px;transition:.3s}
+
+/* ─── ADMIN PANEL STYLE (hidden) ─── */
+.admin-panel{display:none}
+
+/* ─── LOADING OVERLAY ─── */
+#loader{position:fixed;inset:0;background:var(--black);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .6s}
+#loader.done{opacity:0;pointer-events:none}
+.loader-logo{font-family:var(--font-head);font-size:3rem;letter-spacing:4px;color:var(--gold);animation:pulse 1s infinite}
+.loader-bar{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loader-fill{height:100%;background:var(--gold);animation:shimmer 1.5s ease-in-out infinite;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-dark));background-size:200%;width:0;transition:width .1s}
+
+/* Strip section for CTA band */
+.cta-band{background:var(--gold);padding:56px 24px;text-align:center}
+.cta-band h2{font-family:var(--font-head);font-size:clamp(2rem,4vw,3.4rem);color:var(--black);letter-spacing:2px;margin-bottom:12px}
+.cta-band p{color:rgba(0,0,0,.65);margin-bottom:28px;font-size:1rem}
+.cta-band-btns{display:flex;justify-content:center;flex-wrap:wrap;gap:14px}
+.btn-dark{background:var(--black);color:var(--gold);padding:14px 32px;border-radius:50px;font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:.3s}
+.btn-dark:hover{background:var(--dark2);transform:translateY(-3px)}
+.btn-white{background:var(--white);color:var(--black);padding:14px 32px;border-radius:50px;font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:.3s}
+.btn-white:hover{background:rgba(255,255,255,.9);transform:translateY(-3px)}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">BRG CABS</div>
+  <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  <p style="color:rgba(255,255,255,.4);font-size:.8rem;letter-spacing:2px">LOADING PREMIUM EXPERIENCE</p>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BACK TO TOP -->
+<button id="btt" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- FLOATING BUTTONS -->
+<div class="float-wrap">
+  <a class="float-call" href="tel:+919811419926" title="Call Now" style="position:relative">
+    <span style="position:absolute;right:68px;background:rgba(0,0,0,.85);color:#fff;padding:5px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;pointer-events:none">📞 Call Now</span>
+    📞
+  </a>
+  <a class="float-wa" href="https://wa.me/919811419926?text=Hi%20BRG%20CABS!%20I%20want%20to%20book%20a%20cab." target="_blank" title="WhatsApp" style="position:relative">
+    <span style="position:absolute;right:68px;background:rgba(0,0,0,.85);color:#fff;padding:5px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;pointer-events:none">💬 WhatsApp</span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+</div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobileMenu()">✕</button>
+  <a href="#hero" onclick="closeMobileMenu()">Home</a>
+  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#services" onclick="closeMobileMenu()">Services</a>
+  <a href="#fleet" onclick="closeMobileMenu()">Fleet</a>
+  <a href="#routes" onclick="closeMobileMenu()">Routes</a>
+  <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  <a href="tel:+919811419926" style="color:var(--gold);margin-top:10px">📞 +91 98114 19926</a>
+</div>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="header-top">
+    <div class="ht-left">
+      <span>✦ Open 24×7</span>
+      <span>📍 Uttam Nagar, New Delhi</span>
+    </div>
+    <div class="ht-right">
+      <a href="tel:+919811419926">📞 +91 98114 19926</a>
+      <a href="https://wa.me/919811419926" target="_blank">💬 WhatsApp</a>
+    </div>
+  </div>
+  <nav class="navbar">
+    <div class="logo">
+      <div class="logo-icon">BRG</div>
+      <div>
+        <div class="logo-text">BRG CABS</div>
+        <div class="logo-sub">Delhi NCR's Trusted Ride</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#hero" class="active">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#fleet">Fleet</a>
+      <a href="#routes">Routes</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="tel:+919811419926" class="nav-cta">📞 Book Now</a>
+    <div class="hamburger" onclick="openMobileMenu()" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════ HERO ═══ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge">⭐ Delhi NCR's #1 Trusted Cab Service</div>
+      <h1 class="hero-h1">Reliable Cab<br>Service in <span>Delhi NCR</span></h1>
+      <p class="hero-sub">24×7 Safe, Affordable & Professional Taxi Services for Airport Transfers, Outstation, Chardham Yatra & More.</p>
+      <div class="hero-btns">
+        <a href="#booking-form" class="btn-primary">🚕 Book Now</a>
+        <a href="tel:+919811419926" class="btn-secondary">📞 Call Now</a>
+        <a href="https://wa.me/919811419926?text=Hi%20BRG%20CABS!%20I%20need%20a%20cab." target="_blank" class="btn-wa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Booking
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">5K+</div><div class="stat-label">Happy Customers</div></div>
+        <div class="stat"><div class="stat-num">8+</div><div class="stat-label">Years Experience</div></div>
+        <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Availability</div></div>
+        <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">Google Rating</div></div>
+      </div>
+    </div>
+    <!-- QUICK BOOKING FORM -->
+    <div class="hero-form-wrap" id="booking-form">
+      <div class="hero-form">
+        <h3>🚕 BOOK YOUR RIDE</h3>
+        <div class="form-group">
+          <label>📍 Pickup Location</label>
+          <input type="text" placeholder="Enter pickup address..." id="f-pickup"/>
+        </div>
+        <div class="form-group">
+          <label>🏁 Drop Location</label>
+          <input type="text" placeholder="Enter drop address..." id="f-drop"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>📅 Date</label>
+            <input type="date" id="f-date"/>
+          </div>
+          <div class="form-group">
+            <label>⏰ Time</label>
+            <input type="time" id="f-time"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>🚗 Car Type</label>
+          <select id="f-car">
+            <option value="">Select Vehicle</option>
+            <option>Sedan (Swift Dzire / Honda City)</option>
+            <option>SUV (Ertiga / Ciaz)</option>
+            <option>Innova Crysta</option>
+            <option>Tempo Traveller (12 Seater)</option>
+            <option>Tempo Traveller (17 Seater)</option>
+            <option>Luxury Car</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>📱 Mobile Number</label>
+          <input type="tel" placeholder="+91 XXXXX XXXXX" id="f-mobile"/>
+        </div>
+        <button class="btn-book" onclick="submitBooking()">🚀 BOOK YOUR RIDE IN MINUTES</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">24×7 TAXI SERVICE</span>
+    <span class="ticker-item">AIRPORT TRANSFERS</span>
+    <span class="ticker-item">CHARDHAM YATRA</span>
+    <span class="ticker-item">OUTSTATION CABS</span>
+    <span class="ticker-item">CORPORATE TRAVEL</span>
+    <span class="ticker-item">TEMPO TRAVELLER</span>
+    <span class="ticker-item">DELHI SIGHTSEEING</span>
+    <span class="ticker-item">SAFE FAMILY TRAVEL</span>
+    <span class="ticker-item">PROFESSIONAL DRIVERS</span>
+    <span class="ticker-item">GPS ENABLED VEHICLES</span>
+    <span class="ticker-item">24×7 TAXI SERVICE</span>
+    <span class="ticker-item">AIRPORT TRANSFERS</span>
+    <span class="ticker-item">CHARDHAM YATRA</span>
+    <span class="ticker-item">OUTSTATION CABS</span>
+    <span class="ticker-item">CORPORATE TRAVEL</span>
+    <span class="ticker-item">TEMPO TRAVELLER</span>
+    <span class="ticker-item">DELHI SIGHTSEEING</span>
+    <span class="ticker-item">SAFE FAMILY TRAVEL</span>
+    <span class="ticker-item">PROFESSIONAL DRIVERS</span>
+    <span class="ticker-item">GPS ENABLED VEHICLES</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SERVICES ═══ -->
+<section id="services" class="section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">Our Services</div>
+      <h2 class="section-title">Premium <span class="title-accent">Travel Solutions</span></h2>
+      <p class="section-sub">From daily commutes to pilgrimage journeys — we cover every mile with comfort, safety & professionalism.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">✈️</div>
+        <h3>Airport Taxi</h3>
+        <p>Reliable pickup & drop for Indira Gandhi International Airport. Flight tracking & on-time guaranteed.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20airport%20taxi" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🗺️</div>
+        <h3>Outstation Cabs</h3>
+        <p>One-way & round trips across India. Comfortable cars with experienced outstation drivers.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20outstation%20cab" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🛕</div>
+        <h3>Chardham Yatra</h3>
+        <p>Sacred journey to Badrinath, Kedarnath, Gangotri & Yamunotri in comfort with experienced drivers.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20Chardham%20Yatra%20package" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🚗</div>
+        <h3>Local Rental</h3>
+        <p>Hourly & daily car rental for local travel within Delhi NCR. Full-day or half-day packages.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20local%20rental" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">💼</div>
+        <h3>Corporate Cab</h3>
+        <p>Scheduled & on-demand corporate travel with monthly billing, GST invoices & dedicated fleet.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20corporate%20cab%20service" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🚐</div>
+        <h3>Tempo Traveller</h3>
+        <p>Group travel made easy. 12–26 seater Tempo Travellers for family trips, events & pilgrimages.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20tempo%20traveller" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🏛️</div>
+        <h3>Delhi Tour Packages</h3>
+        <p>Curated Delhi sightseeing packages covering Red Fort, Qutub Minar, India Gate, Lotus Temple & more.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20Delhi%20tour%20package" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🙏</div>
+        <h3>Devotee Place Yatra</h3>
+        <p>Special yatra packages to Vaishno Devi, Vrindavan, Mathura, Haridwar, Rishikesh & Shirdi.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20devotee%20yatra%20package" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">💍</div>
+        <h3>Wedding Transport</h3>
+        <p>Elegant & decorated vehicles for weddings, receptions and all event transportation needs.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20wedding%20transportation" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🎯</div>
+        <h3>One Way Taxi</h3>
+        <p>Cost-effective one-way trips to any city. Pay only for the distance you travel.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20one%20way%20taxi" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🔄</div>
+        <h3>Round Trip Cabs</h3>
+        <p>Comfortable round trips with flexible schedules and competitive pricing for all destinations.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20round%20trip%20cab" class="service-link" target="_blank">Book Now →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🧳</div>
+        <h3>Chauffeur Driven</h3>
+        <p>Premium chauffeur service for executives, VIPs and special occasions with luxury vehicles.</p>
+        <a href="https://wa.me/919811419926?text=I%20need%20chauffeur%20service" class="service-link" target="_blank">Book Now →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ WHY CHOOSE ═══ -->
+<section id="why" class="section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge" style="background:rgba(245,197,24,.15);border-color:rgba(245,197,24,.3)">Why BRG CABS</div>
+      <h2 class="section-title" style="color:var(--white)">Why <span class="title-accent">Choose Us</span></h2>
+      <p class="section-sub" style="color:rgba(255,255,255,.5)">We go beyond just driving — we deliver experiences that make every journey memorable.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-icon">🕐</div><div><h4>24/7 Availability</h4><p>Round-the-clock service — early mornings, late nights, festivals, holidays. We're always there when you need us.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">👨‍✈️</div><div><h4>Professional Drivers</h4><p>Verified, trained and courteous drivers with extensive knowledge of Delhi NCR routes and outstation highways.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">💰</div><div><h4>Affordable Pricing</h4><p>Transparent, competitive pricing with no hidden charges. Best rates guaranteed for all travel categories.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">🧼</div><div><h4>Clean & Sanitized Cars</h4><p>Every vehicle is thoroughly cleaned and sanitized before each trip for a safe, hygienic travel experience.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">📡</div><div><h4>GPS Enabled Vehicles</h4><p>All our cars are GPS tracked for real-time monitoring, ensuring route accuracy and passenger safety.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">👨‍👩‍👧‍👦</div><div><h4>Safe Family Travel</h4><p>Child-friendly, safe vehicles with experienced drivers — trusted by thousands of families across Delhi NCR.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">⚡</div><div><h4>Instant Booking</h4><p>Book in under 60 seconds via call, WhatsApp or our booking form. Instant confirmation every time.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">🏆</div><div><h4>8+ Years Experience</h4><p>Trusted by 5,000+ customers over 8 years of dedicated service in Delhi NCR with 4.9★ Google rating.</p></div></div>
+      <div class="why-card reveal"><div class="why-icon">📝</div><div><h4>GST Invoices</h4><p>Proper billing with GST-compliant invoices for all corporate and business travel requirements.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FLEET ═══ -->
+<section id="fleet" class="section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">Our Fleet</div>
+      <h2 class="section-title">Premium <span class="title-accent">Vehicle Fleet</span></h2>
+      <p class="section-sub">Choose from our well-maintained, sanitized fleet of vehicles for every budget and group size.</p>
+    </div>
+    <div class="fleet-grid">
+      <div class="fleet-card reveal">
+        <div class="fleet-img">
+          <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500&q=80" alt="Sedan Taxi Delhi"/>
+          <div class="fleet-badge">Most Popular</div>
+        </div>
+        <div class="fleet-body">
+          <h3>Sedan</h3>
+          <p style="font-size:.82rem;color:var(--gray)">Swift Dzire / Honda City / Ciaz</p>
+          <div class="fleet-specs">
+            <div class="fleet-spec">👥 4 Seats</div>
+            <div class="fleet-spec">🧳 2 Bags</div>
+            <div class="fleet-spec">❄️ AC</div>
+          </div>
+          <div class="fleet-price">
+            <div><div class="price-tag">₹12/km</div><div class="price-label">Starting Price</div></div>
+            <a href="https://wa.me/919811419926?text=Book%20Sedan" class="btn-fleet" target="_blank">Book</a>
+          </div>
+        </div>
+      </div>
+      <div class="fleet-card reveal">
+        <div class="fleet-img">
+          <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&q=80" alt="SUV Taxi Delhi"/>
+          <div class="fleet-badge">Family Choice</div>
+        </div>
+        <div class="fleet-body">
+          <h3>SUV</h3>
+          <p style="font-size:.82rem;color:var(--gray)">Ertiga / XL6 / Scorpio</p>
+          <div class="fleet-specs">
+            <div class="fleet-spec">👥 6 Seats</div>
+            <div class="fleet-spec">🧳 4 Bags</div>
+            <div class="fleet-spec">❄️ AC</div>
+          </div>
+          <div class="fleet-price">
+            <div><div class="price-tag">₹15/km</div><div class="price-label">Starting Price</div></div>
+            <a href="https://wa.me/919811419926?text=Book%20SUV" class="btn-fleet" target="_blank">Book</a>
+          </div>
+        </div>
+      </div>
+      <div class="fleet-card reveal">
+        <div class="fleet-img">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" alt="Innova Crysta Delhi"/>
+          <div class="fleet-badge">Premium</div>
+        </div>
+        <div class="fleet-body">
+          <h3>Innova Crysta</h3>
+          <p style="font-size:.82rem;color:var(--gray)">Toyota Innova Crysta 2.4G/2.8Z</p>
+          <div class="fleet-specs">
+            <div class="fleet-spec">👥 7 Seats</div>
+            <div class="fleet-spec">🧳 5 Bags</div>
+            <div class="fleet-spec">❄️ AC</div>
+          </div>
+          <div class="fleet-price">
+            <div><div class="price-tag">₹18/km</div><div class="price-label">Starting Price</div></div>
+            <a href="https://wa.me/919811419926?text=Book%20Innova%20Crysta" class="btn-fleet" target="_blank">Book</a>
+          </div>
+        </div>
+      </div>
+      <div class="fleet-card reveal">
+        <div class="fleet-img">
+          <div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:4rem">🚐</div>
+          <div class="fleet-badge">Group Travel</div>
+        </div>
+        <div class="fleet-body">
+          <h3>Tempo Traveller</h3>
+          <p style="font-size:.82rem;color:var(--gray)">12 / 17 / 26 Seater Options</p>
+          <div class="fleet-specs">
+            <div class="fleet-spec">👥 12-26</div>
+            <div class="fleet-spec">🧳 Group</div>
+            <div class="fleet-spec">❄️ AC</div>
+          </div>
+          <div class="fleet-price">
+            <div><div class="price-tag">₹25/km</div><div class="price-label">Starting Price</div></div>
+            <a href="https://wa.me/919811419926?text=Book%20Tempo%20Traveller" class="btn-fleet" target="_blank">Book</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px">
+      <p style="color:var(--gray);font-size:.88rem;margin-bottom:16px">*Prices vary by distance & trip type. Contact us for exact quotes.</p>
+      <a href="tel:+919811419926" class="btn-primary" style="display:inline-flex">📞 Get Custom Quote</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ ROUTES ═══ -->
+<section id="routes" class="section" style="background:var(--light)">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">Popular Routes</div>
+      <h2 class="section-title">We Cover <span class="title-accent">Every Route</span></h2>
+      <p class="section-sub">From Delhi to any destination in India — outstation, pilgrimage, leisure or business.</p>
+    </div>
+    <div class="routes-search reveal">
+      <input type="text" placeholder="🔍 Search a route or city..." id="routeSearch" oninput="filterRoutes()"/>
+    </div>
+    <div class="routes-grid" id="routesGrid">
+      <!-- will be injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ REVIEWS ═══ -->
+<section id="reviews" class="section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;margin-bottom:20px" class="reveal">
+      <div class="overall-rating" style="min-width:200px">
+        <div style="font-size:.75rem;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Google Rating</div>
+        <div class="big-num">4.9</div>
+        <div class="stars">★★★★★</div>
+        <p>Based on 500+ Reviews</p>
+        <div class="google-badge" style="margin-top:12px">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google Reviews
+        </div>
+      </div>
+      <div>
+        <div class="section-badge" style="background:rgba(245,197,24,.15)">Customer Reviews</div>
+        <h2 class="section-title" style="color:var(--white)">What Our <span class="title-accent">Passengers Say</span></h2>
+        <p class="section-sub" style="color:rgba(255,255,255,.5)">Real experiences from real passengers who chose BRG CABS.</p>
+      </div>
+    </div>
+    <div class="reviews-slider reveal">
+      <div class="reviews-track" id="reviewsTrack">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+    <div class="slider-controls">
+      <button class="slider-btn" onclick="slideReviews(-1)">←</button>
+      <button class="slider-btn" onclick="slideReviews(1)">→</button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ ABOUT ═══ -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img-wrap reveal">
+        <div class="about-main-img">
+          <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=700&q=80" alt="BRG CABS - Professional Taxi Service Delhi"/>
+        </div>
+        <div class="about-accent">
+          <div class="num">8+</div>
+          <p>Years of<br>Excellence</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="section-badge">About BRG CABS</div>
+        <h2 class="section-title">Delhi's Most <span class="title-accent">Trusted</span><br>Cab Service</h2>
+        <p style="color:var(--gray);line-height:1.9;margin-bottom:20px">BRG CABS is a premier cab and travel service based in Uttam Nagar, New Delhi, serving the entire Delhi NCR region and beyond. With over 8 years of industry experience, we have built our reputation on the foundations of safety, punctuality, and exceptional customer service.</p>
+        <p style="color:var(--gray);line-height:1.9;margin-bottom:28px">From daily airport transfers to spiritual Chardham Yatras, corporate travel to family outstation trips — our professional team ensures every journey is comfortable, safe, and memorable. We operate 24×7, 365 days a year, ensuring you're never stranded.</p>
+        <div class="about-features">
+          <div class="about-feat">Police Verified Drivers</div>
+          <div class="about-feat">GPS Tracked Vehicles</div>
+          <div class="about-feat">Pan India Coverage</div>
+          <div class="about-feat">GST Billing Available</div>
+          <div class="about-feat">Sanitized Fleet Daily</div>
+          <div class="about-feat">Instant Confirmation</div>
+          <div class="about-feat">5,000+ Happy Customers</div>
+          <div class="about-feat">4.9★ Google Rating</div>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px">
+          <a href="tel:+919811419926" class="btn-primary">📞 Call Us Now</a>
+          <a href="https://wa.me/919811419926" target="_blank" class="btn-secondary" style="color:var(--black);border-color:var(--black)">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band reveal">
+  <h2>BOOK YOUR RIDE IN MINUTES</h2>
+  <p>Safe & Affordable Cab Service • Professional Drivers, Comfortable Journey</p>
+  <div class="cta-band-btns">
+    <a href="tel:+919811419926" class="btn-dark">📞 Call +91 98114 19926</a>
+    <a href="https://wa.me/919811419926?text=Hi%20BRG%20CABS!%20I%20want%20to%20book%20a%20cab." target="_blank" class="btn-white">💬 WhatsApp Booking</a>
+    <a href="#booking-form" class="btn-dark">🚕 Book Online</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ GALLERY ═══ -->
+<section id="gallery" class="section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">Gallery</div>
+      <h2 class="section-title">Our <span class="title-accent">Journey</span> in Pictures</h2>
+      <p class="section-sub">A glimpse of our fleet, customer trips, airport pickups and memorable journeys.</p>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item tall">
+        <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&q=80" alt="BRG Cabs Premium Taxi"/>
+      </div>
+      <div class="gallery-item wide">
+        <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&q=80" alt="Delhi Airport Taxi Transfer"/>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Outstation Cab Delhi"/>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80" alt="Chardham Yatra Trip"/>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1570215171323-4ec328f3f5fa?w=400&q=80" alt="Tempo Traveller Group"/>
+      </div>
+      <div class="gallery-item wide tall">
+        <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&q=80" alt="Corporate Travel Delhi"/>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1490650034971-26b3c4bfceb8?w=400&q=80" alt="Family Cab Trip"/>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=400&q=80" alt="Delhi Sightseeing Tour"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FAQ ═══ -->
+<section id="faq" class="section" style="background:var(--light)">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">FAQ</div>
+      <h2 class="section-title">Frequently Asked <span class="title-accent">Questions</span></h2>
+      <p class="section-sub">Everything you need to know about BRG CABS services.</p>
+    </div>
+    <div class="faq-grid reveal" id="faqGrid">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ PAYMENT ═══ -->
+<section id="payment" class="section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-badge">Payment Options</div>
+      <h2 class="section-title">Multiple <span class="title-accent">Payment Modes</span></h2>
+      <p class="section-sub">We accept all major payment methods for your convenience.</p>
+    </div>
+    <div class="payment-methods reveal">
+      <div class="payment-badge"><span>💵</span>Cash Payment</div>
+      <div class="payment-badge"><span>📱</span>UPI / GPay</div>
+      <div class="payment-badge"><span>📱</span>PhonePe</div>
+      <div class="payment-badge"><span>📱</span>Paytm</div>
+      <div class="payment-badge"><span>💳</span>Debit Card</div>
+      <div class="payment-badge"><span>💳</span>Credit Card</div>
+      <div class="payment-badge"><span>🏦</span>Net Banking</div>
+      <div class="payment-badge"><span>📲</span>NEFT / RTGS</div>
+      <div class="payment-badge"><span>📝</span>Corporate Billing</div>
+    </div>
+    <p style="color:var(--gray);font-size:.85rem;margin-top:20px">All payments are 100% secure. GST invoices available for corporate clients.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ CONTACT ═══ -->
+<section id="contact" class="section">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="section-badge" style="background:rgba(245,197,24,.15)">Contact Us</div>
+        <h2 class="section-title" style="color:var(--white)">Get In <span class="title-accent">Touch</span></h2>
+        <p style="color:rgba(255,255,255,.55);margin-bottom:36px;line-height:1.8">Ready to book your ride? Contact us via call, WhatsApp or fill the form. We respond instantly.</p>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4>Phone / WhatsApp</h4>
+            <a href="tel:+919811419926" style="font-size:1.15rem;font-weight:700">+91 98114 19926</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h4>Our Location</h4>
+            <p>Uttam Nagar, New Delhi – 110059, India</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🌐</div>
+          <div>
+            <h4>Website</h4>
+            <a href="https://brgcabs.in" target="_blank">www.brgcabs.in</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">⏰</div>
+          <div>
+            <h4>Working Hours</h4>
+            <p>Open 24 Hours, 7 Days a Week</p>
+          </div>
+        </div>
+        <div class="social-links">
+          <a href="https://facebook.com" target="_blank" class="social-link" title="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="social-link" title="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://youtube.com" target="_blank" class="social-link" title="YouTube">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+        <div class="map-wrap">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.9!2d77.0544!3d28.6235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d053f6e3c5555%3A0x123456789!2sUttam+Nagar%2C+New+Delhi!5e0!3m2!1sen!2sin!4v1"
+            width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy"
+            title="BRG CABS Location - Uttam Nagar, New Delhi">
+          </iframe>
+        </div>
+      </div>
+      <div class="contact-form-wrap reveal">
+        <h3>📋 SEND INQUIRY</h3>
+        <div class="cf-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your full name" id="cf-name"/>
+        </div>
+        <div class="cf-group">
+          <label>Mobile Number</label>
+          <input type="tel" placeholder="+91 XXXXX XXXXX" id="cf-phone"/>
+        </div>
+        <div class="cf-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="your@email.com" id="cf-email"/>
+        </div>
+        <div class="cf-group">
+          <label>Service Required</label>
+          <select id="cf-service">
+            <option value="">Select Service</option>
+            <option>Airport Taxi</option>
+            <option>Outstation Cab</option>
+            <option>Chardham Yatra</option>
+            <option>Local Rental</option>
+            <option>Corporate Travel</option>
+            <option>Tempo Traveller</option>
+            <option>Delhi Sightseeing</option>
+            <option>Devotee Yatra</option>
+            <option>Wedding Transport</option>
+            <option>One Way Taxi</option>
+          </select>
+        </div>
+        <div class="cf-group">
+          <label>Your Message</label>
+          <textarea rows="4" placeholder="Tell us your travel requirement..." id="cf-msg"></textarea>
+        </div>
+        <button class="btn-send" onclick="submitInquiry()">✉️ SEND INQUIRY</button>
+        <div style="text-align:center;margin-top:20px">
+          <p style="color:rgba(255,255,255,.4);font-size:.8rem;margin-bottom:12px">Or contact directly</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <a href="tel:+919811419926" class="btn-primary" style="font-size:.85rem;padding:10px 20px">📞 Call Now</a>
+            <a href="https://wa.me/919811419926" target="_blank" class="btn-wa" style="font-size:.85rem;padding:10px 20px">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FOOTER ═══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon" style="background:var(--gold);width:42px;height:42px;font-size:1.1rem">BRG</div>
+          <div>
+            <div class="logo-text" style="font-size:1.6rem">BRG CABS</div>
+            <div class="logo-sub" style="color:rgba(255,255,255,.4)">Delhi NCR's Trusted Ride</div>
+          </div>
+        </div>
+        <p>Reliable, safe & affordable cab service in Delhi NCR. Serving families, corporates, pilgrims & tourists since 2016. Available 24×7.</p>
+        <div class="footer-cert">
+          <span class="cert-badge">✓ GPS Tracked</span>
+          <span class="cert-badge">✓ Verified Drivers</span>
+          <span class="cert-badge">✓ GST Registered</span>
+          <span class="cert-badge">✓ 24×7 Available</span>
+        </div>
+        <div class="social-links" style="margin-top:20px">
+          <a href="https://facebook.com" target="_blank" class="social-link" title="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="social-link" title="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://youtube.com" target="_blank" class="social-link" title="YouTube">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#fleet">Our Fleet</a></li>
+          <li><a href="#routes">Outstation Routes</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+          <li><a href="#booking-form">Book Taxi</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Our Services</h4>
+        <ul>
+          <li><a href="#">Airport Taxi</a></li>
+          <li><a href="#">Outstation Cabs</a></li>
+          <li><a href="#">Chardham Yatra</a></li>
+          <li><a href="#">Local Cab Rental</a></li>
+          <li><a href="#">Corporate Travel</a></li>
+          <li><a href="#">Tempo Traveller</a></li>
+          <li><a href="#">Delhi Sightseeing</a></li>
+          <li><a href="#">Devotee Yatra</a></li>
+          <li><a href="#">Wedding Transport</a></li>
+          <li><a href="#">One Way Taxi</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Info</h4>
+        <div class="footer-contact-item"><span>📞</span><div><strong style="color:#fff;display:block;font-size:.85rem">Call / WhatsApp</strong><a href="tel:+919811419926" style="color:var(--gold);font-weight:600">+91 98114 19926</a></div></div>
+        <div class="footer-contact-item"><span>📍</span><div><strong style="color:#fff;display:block;font-size:.85rem">Address</strong>Uttam Nagar, New Delhi – 110059</div></div>
+        <div class="footer-contact-item"><span>🌐</span><div><strong style="color:#fff;display:block;font-size:.85rem">Website</strong><a href="https://brgcabs.in" style="color:var(--gold)">brgcabs.in</a></div></div>
+        <div class="footer-contact-item"><span>⏰</span><div><strong style="color:#fff;display:block;font-size:.85rem">Working Hours</strong>24×7, 365 Days</div></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 BRG CABS. All Rights Reserved. | Designed with ❤️ for Delhi NCR</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Refund Policy</a>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── DATA ───
+const routes = [
+  {from:"Delhi",to:"Jaipur",km:"280 km",icon:"🏰"},
+  {from:"Delhi",to:"Agra",km:"230 km",icon:"🕌"},
+  {from:"Delhi",to:"Chandigarh",km:"250 km",icon:"🌳"},
+  {from:"Delhi Airport",to:"Delhi NCR",km:"Local",icon:"✈️"},
+  {from:"Delhi",to:"Sightseeing",km:"City Tour",icon:"🏛️"},
+  {from:"Delhi",to:"Haridwar",km:"220 km",icon:"🙏"},
+  {from:"Delhi",to:"Rishikesh",km:"240 km",icon:"🧘"},
+  {from:"Delhi",to:"Shimla",km:"360 km",icon:"⛰️"},
+  {from:"Delhi",to:"Manali",km:"570 km",icon:"🏔️"},
+  {from:"Delhi",to:"Dehradun",km:"300 km",icon:"🌲"},
+  {from:"Delhi",to:"Mussoorie",km:"310 km",icon:"🌄"},
+  {from:"Delhi",to:"Mathura",km:"165 km",icon:"🛕"},
+  {from:"Delhi",to:"Vrindavan",km:"155 km",icon:"🌸"},
+  {from:"Delhi",to:"Lucknow",km:"555 km",icon:"🏙️"},
+  {from:"Delhi",to:"Amritsar",km:"450 km",icon:"⭐"},
+  {from:"Delhi",to:"Varanasi",km:"820 km",icon:"🪔"},
+  {from:"Delhi",to:"Nainital",km:"310 km",icon:"⛵"},
+  {from:"Delhi",to:"Jim Corbett",km:"245 km",icon:"🐯"},
+  {from:"Delhi",to:"Badrinath",km:"540 km",icon:"🛕"},
+  {from:"Delhi",to:"Kedarnath",km:"460 km",icon:"🏔️"},
+  {from:"Delhi",to:"Gangotri",km:"485 km",icon:"🏞️"},
+  {from:"Delhi",to:"Yamunotri",km:"430 km",icon:"🌊"},
+  {from:"Delhi",to:"Dharamshala",km:"490 km",icon:"☁️"},
+  {from:"Delhi",to:"Vaishno Devi",km:"700 km",icon:"🙏"},
+  {from:"Delhi",to:"Jodhpur",km:"610 km",icon:"🏯"},
+  {from:"Delhi",to:"Udaipur",km:"685 km",icon:"🏝️"},
+  {from:"Delhi",to:"Pushkar",km:"400 km",icon:"🌺"},
+  {from:"Delhi",to:"Kota",km:"490 km",icon:"🌾"},
+  {from:"Delhi",to:"Ajmer",km:"395 km",icon:"✨"},
+  {from:"Delhi",to:"Pathankot",km:"470 km",icon:"🛡️"},
+  {from:"Delhi",to:"Lansdowne",km:"255 km",icon:"🌿"},
+  {from:"Delhi",to:"Kanpur",km:"490 km",icon:"🏭"},
+];
+
+const reviews = [
+  {name:"Rajesh Kumar",loc:"Rohini, Delhi",rating:5,text:"BRG CABS is simply outstanding! I booked an Innova for our family trip to Haridwar. The driver was punctual, the car was spotless, and the journey was so comfortable. Will definitely book again for Chardham Yatra!"},
+  {name:"Priya Sharma",loc:"Dwarka, Delhi",rating:5,text:"Excellent airport cab service! I was nervous about catching an early morning flight, but BRG CABS arrived 15 minutes early. Very professional driver, clean car. Highly recommended for airport transfers!"},
+  {name:"Amit Singh",loc:"Noida",rating:5,text:"Used BRG CABS for our corporate office travel needs. On-time every single day, GST billing, professional drivers. Best corporate taxi service in Delhi NCR. My entire team uses them now."},
+  {name:"Sunita Verma",loc:"Faridabad",rating:5,text:"Booked a Tempo Traveller for a group pilgrimage to Vrindavan. 14 people, very comfortable journey, affordable price. The driver knew all the routes and was very helpful. 5 stars!"},
+  {name:"Vikram Malhotra",loc:"Gurgaon",rating:5,text:"Used their one-way taxi from Delhi to Jaipur. Excellent Swift Dzire, very cooperative driver, and the price was better than any app-based service. Instant WhatsApp booking — super convenient!"},
+  {name:"Meena Gupta",loc:"Uttam Nagar, Delhi",rating:5,text:"As a local resident of Uttam Nagar, BRG CABS has been my go-to cab service for years. Reliable, honest pricing, and the drivers are always courteous. Trust them completely for my elderly parents' trips."},
+  {name:"Deepak Arora",loc:"Pitampura, Delhi",rating:5,text:"Booked for Delhi to Manali trip with family. The Innova Crysta was perfect for mountain roads. Driver was experienced with hill driving. The entire 570km journey was smooth and safe. Will book again!"},
+  {name:"Anita Joshi",loc:"Saket, Delhi",rating:5,text:"BRG CABS provided wedding transportation for my daughter's wedding. All 5 cars arrived on time, beautifully maintained, drivers in formals. Made our special day even more memorable. Thank you BRG!"},
+];
+
+const faqs = [
+  {q:"How do I book a cab with BRG CABS?",a:"You can book easily via our website form, call us at +91 98114 19926, or send a WhatsApp message. We provide instant confirmation within minutes."},
+  {q:"Do you provide 24×7 cab service?",a:"Yes! BRG CABS operates 24 hours a day, 7 days a week, 365 days a year — including all holidays and festivals."},
+  {q:"What areas do you cover in Delhi NCR?",a:"We cover entire Delhi, Noida, Gurgaon, Faridabad, Ghaziabad, Greater Noida and all surrounding areas in NCR."},
+  {q:"Do you provide outstation taxi service?",a:"Yes, we offer outstation services to all major cities and tourist destinations across India — both one-way and round trip."},
+  {q:"What is your pricing for airport transfers?",a:"Airport transfer pricing starts from ₹800 for a sedan depending on pickup location. Contact us for exact pricing."},
+  {q:"Are your drivers police verified?",a:"Absolutely! All our drivers are police verified, have valid commercial licenses, and undergo regular training."},
+  {q:"Do you provide Chardham Yatra packages?",a:"Yes! We offer complete Chardham Yatra packages from Delhi covering Badrinath, Kedarnath, Gangotri and Yamunotri."},
+  {q:"What vehicles are available for groups?",a:"For groups, we offer 7-seater Innova Crysta, 12-seater and 17-seater Tempo Travellers, and larger options up to 26 seats."},
+  {q:"Do you provide GST invoices?",a:"Yes, we provide GST-compliant invoices for all corporate bookings and business travel requirements."},
+  {q:"What payment methods do you accept?",a:"We accept cash, UPI (GPay, PhonePe, Paytm), debit/credit cards, net banking, and corporate billing/NEFT."},
+];
+
+// ─── INIT ───
+window.addEventListener('load', ()=>{
+  // Loader
+  let progress = 0;
+  const fill = document.getElementById('loaderFill');
+  const interval = setInterval(()=>{
+    progress += Math.random()*15;
+    if(progress >= 100){
+      progress = 100;
+      clearInterval(interval);
+      setTimeout(()=>{
+        document.getElementById('loader').classList.add('done');
+        setTimeout(()=>document.getElementById('loader').remove(),700);
+      },300);
+    }
+    fill.style.width = progress + '%';
+  },100);
+
+  buildRoutes();
+  buildReviews();
+  buildFAQ();
+  setMinDate();
+  initScrollEffects();
+});
+
+function setMinDate(){
+  const d = new Date();
+  document.getElementById('f-date').min = d.toISOString().split('T')[0];
+}
+
+// ─── ROUTES ───
+function buildRoutes(){
+  renderRoutes(routes);
+}
+
+function renderRoutes(list){
+  const g = document.getElementById('routesGrid');
+  g.innerHTML = list.map(r=>`
+    <div class="route-card" onclick="bookRoute('${r.from} to ${r.to}')">
+      <div class="route-icon">${r.icon}</div>
+      <div class="route-info">
+        <strong>${r.from} → ${r.to}</strong>
+        <span>${r.km}</span>
+      </div>
+      <div class="route-km">Book →</div>
+    </div>
+  `).join('');
+}
+
+function filterRoutes(){
+  const q = document.getElementById('routeSearch').value.toLowerCase();
+  const filtered = routes.filter(r=>
+    r.from.toLowerCase().includes(q)||r.to.toLowerCase().includes(q)
+  );
+  renderRoutes(filtered);
+}
+
+function bookRoute(route){
+  const msg = encodeURIComponent(`Hi BRG CABS! I want to book a cab for ${route}. Please share pricing.`);
+  window.open(`https://wa.me/919811419926?text=${msg}`,'_blank');
+}
+
+// ─── REVIEWS ───
+let reviewIndex = 0;
+function buildReviews(){
+  const track = document.getElementById('reviewsTrack');
+  track.innerHTML = reviews.map((r,i)=>`
+    <div class="review-card">
+      <div class="google-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Google Review
+      </div>
+      <div class="review-stars">${'★'.repeat(r.rating)}</div>
+      <p class="review-text">"${r.text}"</p>
+      <div class="review-author">
+        <div class="review-avatar">${r.name[0]}</div>
+        <div><strong>${r.name}</strong><span>${r.loc}</span></div>
+      </div>
+    </div>
+  `).join('');
+
+  const dots = document.getElementById('sliderDots');
+  const visible = Math.ceil(reviews.length / 3);
+  dots.innerHTML = Array.from({length:visible},(_,i)=>`<div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`).join('');
+}
+
+function slideReviews(dir){
+  const cards = document.querySelectorAll('.review-card');
+  const cardW = 340 + 24;
+  const max = Math.max(0, cards.length - 3);
+  reviewIndex = Math.max(0, Math.min(max, reviewIndex + dir));
+  document.getElementById('reviewsTrack').style.transform = `translateX(-${reviewIndex * cardW}px)`;
+  updateDots();
+}
+
+function goToSlide(i){
+  reviewIndex = i * 3;
+  const cards = document.querySelectorAll('.review-card');
+  const cardW = 340 + 24;
+  document.getElementById('reviewsTrack').style.transform = `translateX(-${reviewIndex * cardW}px)`;
+  updateDots();
+}
+
+function updateDots(){
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.classList.toggle('active', Math.floor(reviewIndex/3) === i);
+  });
+}
+
+// Auto-slide reviews
+setInterval(()=>slideReviews(1), 5000);
+
+// ─── FAQ ───
+function buildFAQ(){
+  const grid = document.getElementById('faqGrid');
+  grid.innerHTML = faqs.map((f,i)=>`
+    <div class="faq-item" onclick="toggleFAQ(${i})" id="faq-${i}">
+      <div class="faq-question">
+        <span>${f.q}</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">${f.a}</div>
+    </div>
+  `).join('');
+}
+
+function toggleFAQ(i){
+  const item = document.getElementById('faq-'+i);
+  item.classList.toggle('open');
+}
+
+// ─── BOOKING FORM ───
+function submitBooking(){
+  const pickup = document.getElementById('f-pickup').value;
+  const drop = document.getElementById('f-drop').value;
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const car = document.getElementById('f-car').value;
+  const mobile = document.getElementById('f-mobile').value;
+
+  if(!pickup||!drop||!mobile){
+    showToast('⚠️ Please fill pickup, drop & mobile number');
+    return;
+  }
+
+  const msg = encodeURIComponent(`🚕 *New Booking Request - BRG CABS*\n\n📍 Pickup: ${pickup}\n🏁 Drop: ${drop}\n📅 Date: ${date||'Flexible'}\n⏰ Time: ${time||'Flexible'}\n🚗 Car: ${car||'Any'}\n📱 Mobile: ${mobile}\n\nPlease confirm availability and pricing.`);
+  window.open(`https://wa.me/919811419926?text=${msg}`,'_blank');
+  showToast('✅ Redirecting to WhatsApp booking!');
+}
+
+// ─── CONTACT FORM ───
+function submitInquiry(){
+  const name = document.getElementById('cf-name').value;
+  const phone = document.getElementById('cf-phone').value;
+  const email = document.getElementById('cf-email').value;
+  const service = document.getElementById('cf-service').value;
+  const msg = document.getElementById('cf-msg').value;
+
+  if(!name||!phone){
+    showToast('⚠️ Please enter your name and phone number');
+    return;
+  }
+
+  const waMsg = encodeURIComponent(`📋 *New Inquiry - BRG CABS Website*\n\n👤 Name: ${name}\n📱 Phone: ${phone}\n📧 Email: ${email||'Not provided'}\n🚗 Service: ${service||'Not specified'}\n\n💬 Message: ${msg||'No message'}`);
+  window.open(`https://wa.me/919811419926?text=${waMsg}`,'_blank');
+  showToast('✅ Inquiry sent! We\'ll contact you shortly.');
+  document.getElementById('cf-name').value='';
+  document.getElementById('cf-phone').value='';
+  document.getElementById('cf-email').value='';
+  document.getElementById('cf-service').value='';
+  document.getElementById('cf-msg').value='';
+}
+
+// ─── TOAST ───
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ─── SCROLL EFFECTS ───
+function initScrollEffects(){
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) e.target.classList.add('visible');
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+  // Header scroll
+  window.addEventListener('scroll',()=>{
+    const h = document.getElementById('header');
+    if(window.scrollY > 60) h.classList.add('scrolled');
+    else h.classList.remove('scrolled');
+
+    // Back to top
+    const btt = document.getElementById('btt');
+    if(window.scrollY > 400) btt.classList.add('show');
+    else btt.classList.remove('show');
+
+    // Active nav
+    const sections = ['hero','services','why','fleet','routes','reviews','about','gallery','faq','contact'];
+    let current = '';
+    sections.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && window.scrollY >= el.offsetTop - 100) current = id;
+    });
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      a.classList.toggle('active', a.getAttribute('href')==='#'+current);
+    });
+  });
+}
+
+// ─── MOBILE MENU ───
+function openMobileMenu(){
+  const m = document.getElementById('mobileMenu');
+  m.style.display = 'flex';
+  setTimeout(()=>m.classList.add('open'),10);
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu(){
+  const m = document.getElementById('mobileMenu');
+  m.classList.remove('open');
+  setTimeout(()=>{m.style.display='none';},400);
+  document.body.style.overflow = '';
+}
+</script>
+</body>
+</html>
