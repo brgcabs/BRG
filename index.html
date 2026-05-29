@@ -18,7 +18,7 @@
 
 <!-- WORKER CONFIG — Replace with your Cloudflare Worker URL -->
 <script>
-  window.WORKER_URL = 'https://brgcabs.YOUR-SUBDOMAIN.workers.dev'; // ← Replace
+  window.WORKER_URL = 'https://holy-bush-00e2.brgtoursindia.workers.dev';
 </script>
 
 <style>
@@ -1091,7 +1091,7 @@ function estimateDist(){
   S.pu = document.getElementById('m-pu').value || S.pu;
   S.dr = document.getElementById('m-dr').value || S.dr;
   if(!S.pu || !S.dr) return;
-  if(WORKER && WORKER !== 'https://brgcabs.YOUR-SUBDOMAIN.workers.dev'){
+  if(WORKER && WORKER !== 'https://holy-bush-00e2.brgtoursindia.workers.dev'){
     fetch(`${WORKER}/api/distance?origin=${encodeURIComponent(S.pu)}&destination=${encodeURIComponent(S.dr)}`)
       .then(r=>r.json()).then(d=>{if(d.distanceKm){S.distKm=d.distanceKm;showDistBadge(d.distanceText,d.durationText);}}).catch(()=>fallbackDist());
   } else { fallbackDist(); }
@@ -1270,7 +1270,7 @@ function sendOTP(){
   ['o1','o2','o3','o4'].forEach(id=>{document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
 
   // Call worker to send real SMS
-  if(WORKER && WORKER!=='https://brgcabs.YOUR-SUBDOMAIN.workers.dev'){
+  if(WORKER && WORKER!=='https://holy-bush-00e2.brgtoursindia.workers.dev'){
     fetch(`${WORKER}/api/otp/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:S.phone,otp:S.otp,name:S.name})})
       .then(r=>r.json()).then(d=>{if(!d.success){document.getElementById('demoOtp').classList.add('show');document.getElementById('demoCode').textContent=S.otp;}})
       .catch(()=>{document.getElementById('demoOtp').classList.add('show');document.getElementById('demoCode').textContent=S.otp;});
@@ -1327,7 +1327,7 @@ function buildSummaryHTML(){
 }
 
 function notifyAdmin(){
-  if(WORKER && WORKER!=='https://brgcabs.YOUR-SUBDOMAIN.workers.dev'){
+  if(WORKER && WORKER!=='https://holy-bush-00e2.brgtoursindia.workers.dev'){
     fetch(`${WORKER}/api/booking/notify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking:{id:S.bookingId,name:S.name,phone:S.phone,email:S.email,vehicleName:S.vehicleName,tripType:S.trip,pickup:S.pu,drop:S.dr,date:S.date,time:S.time,pax:S.pax,distKm:S.distKm,totalFare:S.totalFare,advAmt:S.advAmt,notes:S.notes}})}).catch(()=>{});
   }
 }
