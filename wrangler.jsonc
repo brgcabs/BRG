@@ -1,0 +1,81 @@
+{
+  // ════════════════════════════════════════════════════════════════
+  //  BRG CABS — Wrangler Configuration
+  //  File: wrangler.jsonc
+  // ════════════════════════════════════════════════════════════════
+
+  // Worker identity
+  "name": "brg-cabs-worker",
+  "main": "worker.js",
+  "compatibility_date": "2025-05-30",
+
+  // ── ENVIRONMENT VARIABLES (non-secret) ──────────────────────────
+  // Secrets (GOOGLE_MAPS_KEY, GOOGLE_SCRIPT_URL, RAZORPAY_KEY_SECRET)
+  // must be added via CLI or Dashboard — never stored here.
+  //
+  //   wrangler secret put GOOGLE_MAPS_KEY
+  //   wrangler secret put GOOGLE_SCRIPT_URL
+  //   wrangler secret put RAZORPAY_KEY_SECRET
+  //
+  "vars": {
+    "RAZORPAY_KEY_ID": "rzp_live_XXXXXXXXXXXX",  // replace with your Key ID
+    "ALLOWED_ORIGIN": "https://www.brgcabs.in"
+  },
+
+  // ── KV NAMESPACE (for booking storage) ──────────────────────────
+  // Create via: wrangler kv namespace create BOOKINGS
+  // Then paste the returned `id` below.
+  "kv_namespaces": [
+    {
+      "binding": "BOOKINGS",          // matches env.BOOKINGS in worker.js
+      "id": "REPLACE_WITH_KV_ID",     // e.g. a1b2c3d4e5f6...
+      "preview_id": "REPLACE_WITH_KV_PREVIEW_ID"  // for wrangler dev
+    }
+  ],
+
+  // ── ROUTES ──────────────────────────────────────────────────────
+  // Intercept only /api/* on your domain — static pages served normally.
+  // Zone ID found at: dash.cloudflare.com → your domain → Overview (right sidebar)
+  "routes": [
+    {
+      "pattern": "www.brgcabs.in/api/*",
+      "zone_name": "brgcabs.in"
+    }
+  ],
+
+  // ── OBSERVABILITY ────────────────────────────────────────────────
+  "observability": {
+    "enabled": true
+  },
+
+  // ── ENVIRONMENTS ────────────────────────────────────────────────
+  // Use: wrangler deploy --env staging  /  wrangler deploy --env production
+  "env": {
+    "staging": {
+      "name": "brg-cabs-worker-staging",
+      "vars": {
+        "RAZORPAY_KEY_ID": "rzp_test_XXXXXXXXXXXX", // use test key for staging
+        "ALLOWED_ORIGIN": "http://localhost:3000"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "BOOKINGS",
+          "id": "REPLACE_WITH_STAGING_KV_ID"
+        }
+      ]
+    },
+    "production": {
+      "name": "brg-cabs-worker",
+      "vars": {
+        "RAZORPAY_KEY_ID": "rzp_live_XXXXXXXXXXXX",
+        "ALLOWED_ORIGIN": "https://www.brgcabs.in"
+      },
+      "routes": [
+        {
+          "pattern": "www.brgcabs.in/api/*",
+          "zone_name": "brgcabs.in"
+        }
+      ]
+    }
+  }
+}
