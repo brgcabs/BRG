@@ -23,7 +23,7 @@
  *  ─────────────────────────────────────────────────────────────
  *  POST /api/otp/send          → Send OTP via WhatsApp Business API
  *  GET  /api/distance          → Google Distance Matrix
- *  GET  /api/places            → Google Places Autocomplete (all India)
+ *  GET  /api/places            → Google Places Autocomplete — Places API (New)
  *  POST /api/payment/order     → Create Razorpay Order
  *  POST /api/payment/verify    → Verify Razorpay Payment Signature
  *  POST /api/booking/notify    → Save booking + notify admin on WhatsApp
@@ -177,37 +177,58 @@ export default {
       }
 
       // ──────────────────────────────────────────────────────────
-      // 3. PLACES AUTOCOMPLETE — All India
+      // 3. PLACES AUTOCOMPLETE — Places API (New)
       // GET /api/places?input=Mumbai airport
       // ──────────────────────────────────────────────────────────
       if (path === '/api/places' && request.method === 'GET') {
-        const input        = url.searchParams.get('input');
-        const sessiontoken = url.searchParams.get('sessiontoken') || '';
+        const input = url.searchParams.get('input');
 
-        if (!input || input.length < 2) {
-          return json({ success: false, error: 'input too short' }, 400);
+        if (!input || input.trim().length < 2) {
+          return json({ success: false, predictions: [] });
         }
 
-        const placesUrl =
-          `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
-          `?input=${encodeURIComponent(input)}` +
-          `&components=country:in` +
-          `&language=en` +
-          `&sessiontoken=${sessiontoken}` +
-          `&key=${env.GOOGLE_MAPS_KEY}`;
-
-        const placesRes  = await fetch(placesUrl);
+        const placesRes = await fetch(
+          'https://places.googleapis.com/v1/places:autocomplete',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':    'application/json',
+              'X-Goog-Api-Key':  env.GOOGLE_MAPS_KEY,
+              'X-Goog-FieldMask':
+                'suggestions.placePrediction.placeId,' +
+                'suggestions.placePrediction.text,' +
+                'suggestions.placePrediction.structuredFormat',
+            },
+            body: JSON.stringify({
+              input,
+              includedRegionCodes: ['IN'],
+            }),
+          }
+        );
         const placesData = await placesRes.json();
 
-        return json({
-          success:     placesData.status === 'OK' || placesData.status === 'ZERO_RESULTS',
-          predictions: (placesData.predictions || []).slice(0, 8).map(p => ({
-            place_id:    p.place_id,
-            description: p.description,
-            main_text:   p.structured_formatting?.main_text,
-            secondary:   p.structured_formatting?.secondary_text,
-          })),
-        });
+        if (!placesRes.ok) {
+          console.error('Places API Error:', placesData);
+          return json({
+            success:     false,
+            error:       placesData.error?.message || 'Places API failed',
+            predictions: [],
+          }, 502);
+        }
+
+        const predictions = (placesData.suggestions || [])
+          .map(item => {
+            const place = item.placePrediction;
+            return {
+              place_id:    place?.placeId    || '',
+              description: place?.text?.text || '',
+              main_text:   place?.structuredFormat?.mainText?.text    || place?.text?.text || '',
+              secondary:   place?.structuredFormat?.secondaryText?.text || '',
+            };
+          })
+          .slice(0, 8);
+
+        return json({ success: true, predictions });
       }
 
       // ──────────────────────────────────────────────────────────

@@ -926,8 +926,8 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
           <button class="htt on" id="htt-ow" onclick="setHTrip('oneway',this)">🎯 One Way</button>
           <button class="htt" id="htt-rt" onclick="setHTrip('roundtrip',this)">🔄 Round Trip</button>
         </div>
-        <div class="fg"><label>📍 Pickup</label><div class="ac-wrap"><input type="text" id="h-pu" placeholder="From…" autocomplete="off" oninput="hAC('h-pu','hacd-pu')"/><div class="ac-dd" id="hacd-pu"></div></div></div>
-        <div class="fg"><label>🏁 Drop</label><div class="ac-wrap"><input type="text" id="h-dr" placeholder="To…" autocomplete="off" oninput="hAC('h-dr','hacd-dr')"/><div class="ac-dd" id="hacd-dr"></div></div></div>
+        <div class="fg"><label>📍 Pickup</label><div class="ac-wrap"><input type="text" id="h-pu" placeholder="From…" autocomplete="off"/><div class="ac-dd" id="hacd-pu"></div></div></div>
+        <div class="fg"><label>🏁 Drop</label><div class="ac-wrap"><input type="text" id="h-dr" placeholder="To…" autocomplete="off"/><div class="ac-dd" id="hacd-dr"></div></div></div>
         <div id="h-distBadge" class="dist-badge"><span>📏</span><span id="h-distTxt"></span></div>
         <div class="fgrid">
           <div class="fg"><label>📅 Date</label><input type="date" id="h-dt"/></div>
@@ -1410,6 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { buildFAQ(); } catch(e) {}
   try { initScroll(); } catch(e) {}
   try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); setupACStop(); } catch(e) {}
+  try { setupHeroAC(); } catch(e) {}
 
   // Dropdown closed by its own outside-click handler (mousedown on body)
   try {
@@ -1454,9 +1455,8 @@ function fetchPlaces(q, inpId, callback) {
   }
 
   const myId = (_reqIds[inpId] = (_reqIds[inpId] || 0) + 1);
-  const token = Math.random().toString(36).substr(2, 9);
 
-  fetch(`${WORKER}/api/places?input=${encodeURIComponent(q)}&sessiontoken=${token}`)
+  fetch(`${WORKER}/api/places?input=${encodeURIComponent(q)}`)
     .then(r => r.json())
     .then(data => {
       if (_reqIds[inpId] !== myId) return; // newer request already in flight — discard
@@ -1488,12 +1488,9 @@ function _getPortal() {
 function _positionPortal(inp) {
   const p = _getPortal();
   const r = inp.getBoundingClientRect();
-  p.style.top   = (r.bottom + window.scrollY + 4) + 'px';
-  p.style.left  = (r.left + window.scrollX) + 'px';
   p.style.width = r.width + 'px';
-  // Reposition to fixed (not scrollY-relative) since position:fixed already accounts for scroll
-  p.style.top  = (r.bottom + 4) + 'px';
-  p.style.left = r.left + 'px';
+  p.style.top   = (r.bottom + 4) + 'px';
+  p.style.left  = r.left + 'px';
 }
 
 function _showLoading(inp) {
@@ -1588,32 +1585,15 @@ function setupAC(inputId, dropId, stateKey) {
 // ── Stop-location input inside the modal (uses modal distance estimator, not hero)
 function setupACStop() {
   const inp = document.getElementById('m-stop');
-  _attachAC(inp, name => { S.stop = name; });
+  _attachAC(inp, name => { S.stop = name; estimateDist(); });
 }
 
-// ── Hero inputs (called from oninput="hAC(...)" inline attribute)
-const _hACBlurAttached = new Set();
-function hAC(inputId, dropId) {
-  const inp = document.getElementById(inputId);
-  if (!inp) return;
-  _activeInp = inp;
-  // Attach blur handler only once per input (these use inline oninput, not _attachAC)
-  if (!_hACBlurAttached.has(inputId)) {
-    _hACBlurAttached.add(inputId);
-    inp.addEventListener('blur', () => {
-      setTimeout(() => { if (_activeInp === inp) _closePortal(); }, 200);
-    });
-  }
-  const q = inp.value.trim();
-  if (q.length < 2) { _currentInp = null; _closePortal(); return; }
-  clearTimeout(acTimers['h_' + inputId]);
-  _showLoading(inp);
-  acTimers['h_' + inputId] = setTimeout(() => {
-    fetchPlaces(q, inp.id, items => _showResults(inp, items, name => {
-      inp.value = name;
-      estimateHeroDist();
-    }));
-  }, 350);
+// ── Hero inputs — use _attachAC for consistent portal/blur behaviour
+function setupHeroAC() {
+  const puInp = document.getElementById('h-pu');
+  const drInp = document.getElementById('h-dr');
+  _attachAC(puInp, name => { puInp.value = name; estimateHeroDist(); });
+  _attachAC(drInp, name => { drInp.value = name; estimateHeroDist(); });
 }
 
 function selectAC(inputId, dropId, key, name){
