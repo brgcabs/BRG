@@ -774,6 +774,12 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
           </div>
         </div>
 
+        <!-- Multi-city stops (round trip only) -->
+        <div id="mc-cities-wrap" style="display:none;margin:10px 0">
+          <div id="mc-cities-list"></div>
+          <button type="button" onclick="addExtraCity()" style="width:100%;padding:11px;border:1.5px dashed var(--gold);background:rgba(245,197,24,.05);border-radius:10px;color:var(--gold);font-weight:700;font-size:.85rem;cursor:pointer;margin-top:6px">➕ Add City / Stop</button>
+        </div>
+
         <div class="fg" id="fg-dr">
           <label>🏁 To Location *</label>
           <div class="ac-wrap">
@@ -1370,12 +1376,16 @@ const VEHICLES = [
   {key:'tempo',  name:'Tempo Traveller',sub:'12–20 Seater · Force/Mahindra',   icon:'🚌', seats:12, rate:35, rateRound:35, badge:'Group Travel'},
 ];
 
+// Minimum flat fares for one-way short trips under 100 km
+const MIN_FARES = { sedan:1500, ertiga:1700, crysta:2000, tempo:3500 };
+
 
 // ── STATE ──
 const S = {
   trip:'oneway', pu:'', dr:'', stop:'', date:'', time:'', retdate:'', pax:'3-4 Passengers',
   vehicle:null, vehicleName:'', rate:0, distKm:0, totalFare:0, advAmt:0,
   name:'', phone:'', email:'', notes:'', bookingId:'', otp:'', step:1, hTrip:'oneway',
+  extraCities:[], // multi-city stops for round trip
 };
 
 // ══ INIT ══
@@ -1425,7 +1435,17 @@ function setMinDate(){const d=new Date().toISOString().split('T')[0];['m-dt','h-
 function setTrip(t){
   S.trip=t;
   ['oneway','roundtrip'].forEach(k=>{document.getElementById('tt-'+k)?.classList.toggle('on',k===t);});
-  document.getElementById('ret-wrap').style.display = t==='roundtrip'?'':'none';
+  const retWrap=document.getElementById('ret-wrap');
+  if(retWrap) retWrap.style.display=t==='roundtrip'?'':'none';
+  // Show/hide multi-city section (round trip only)
+  const mcWrap=document.getElementById('mc-cities-wrap');
+  if(mcWrap) mcWrap.style.display=t==='roundtrip'?'':'none';
+  // Sync hero toggle buttons
+  const httOw=document.getElementById('htt-ow'),httRt=document.getElementById('htt-rt');
+  if(httOw&&httRt){httOw.classList.toggle('on',t==='oneway');httRt.classList.toggle('on',t==='roundtrip');}
+  const hRetWrap=document.getElementById('h-retWrap');
+  if(hRetWrap) hRetWrap.style.display=t==='roundtrip'?'':'none';
+  S.hTrip=t;
   if(mStep===2) buildCabResults();
   updateMBtnLabel();
 }
@@ -1620,6 +1640,63 @@ function setupACStop() {
   _attachAC(inp, name => { S.stop = name; estimateDist(); });
 }
 
+// ══ MULTI-CITY (Round Trip) ══
+function _renderExtraCities(){
+  const list=document.getElementById('mc-cities-list');
+  if(!list) return;
+  if(!S.extraCities||!S.extraCities.length){list.innerHTML='';return;}
+  list.innerHTML=S.extraCities.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(245,197,24,.25);border-radius:10px;padding:10px 14px;font-size:.88rem;color:var(--white)">
+        🏙️ <span style="font-weight:600">${c||'City '+(i+1)}</span>
+      </div>
+      <button onclick="removeExtraCity(${i})" style="background:rgba(255,80,80,.15);border:none;color:#ff6b6b;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:1.1rem;flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+
+function addExtraCity(){
+  // Show a temporary input row
+  const list=document.getElementById('mc-cities-list');
+  const idx=S.extraCities.length;
+  const rowId='mc-row-'+idx;
+  const inpId='mc-inp-'+idx;
+  const acdId='mc-acd-'+idx;
+  const div=document.createElement('div');
+  div.id=rowId;
+  div.style.cssText='margin-bottom:8px';
+  div.innerHTML=`
+    <label style="font-size:.78rem;font-weight:600;color:var(--gold);display:block;margin-bottom:4px">🏙️ City / Stop ${idx+1}</label>
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <div class="ac-wrap" style="flex:1;position:relative">
+        <input type="text" id="${inpId}" placeholder="Search city, locality…" autocomplete="off"
+          style="width:100%;padding:11px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(245,197,24,.3);border-radius:10px;color:#fff;font-size:.88rem;box-sizing:border-box"/>
+        <div class="ac-dd" id="${acdId}"></div>
+      </div>
+      <button onclick="confirmExtraCity(${idx},'${inpId}','${rowId}')"
+        style="background:var(--gold);color:#000;border:none;padding:11px 16px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;white-space:nowrap;flex-shrink:0">Add ✓</button>
+    </div>`;
+  list.appendChild(div);
+  const inp=document.getElementById(inpId);
+  inp.focus();
+  // Attach autocomplete
+  _attachAC(inp, name=>{ inp.value=name; });
+}
+
+function confirmExtraCity(idx,inpId,rowId){
+  const val=document.getElementById(inpId)?.value.trim();
+  if(!val){toast('⚠️ Please enter a city name');return;}
+  S.extraCities[idx]=val;
+  _renderExtraCities();
+  // Re-estimate distance with stops
+  estimateDist();
+}
+
+function removeExtraCity(i){
+  S.extraCities.splice(i,1);
+  _renderExtraCities();
+  estimateDist();
+}
+
 // ── Hero inputs — use _attachAC for consistent portal/blur behaviour
 function setupHeroAC() {
   const puInp = document.getElementById('h-pu');
@@ -1701,13 +1778,21 @@ function heroDistFallback(){
 
 function calcHeroFare(){
   if(!S.distKm) return;
-  const isRound = S.hTrip==='roundtrip';
-  const fc = document.getElementById('h-fareCard');
+  const isRound=S.hTrip==='roundtrip';
+  const km=S.distKm;
+  const fc=document.getElementById('h-fareCard');
   fc.classList.add('show');
-  fc.innerHTML = VEHICLES.map(v=>{
-    const activeRate = isRound ? v.rateRound : v.rate;
-    const fare = Math.ceil(S.distKm * activeRate * (isRound?2:1)) + (isRound?300:0);
-    return `<div class="h-fare-row"><span>${v.icon} ${v.name}</span><span>₹${fare.toLocaleString('en-IN')}</span></div>`;
+  fc.innerHTML=VEHICLES.map(v=>{
+    let fare;
+    if(isRound){
+      fare=Math.ceil(km*v.rateRound*2)+300;
+    } else {
+      const perKm=Math.ceil(km*v.rate);
+      const minF=MIN_FARES[v.key]||0;
+      fare=km<100?Math.max(perKm,minF):perKm;
+    }
+    const isMin=!isRound&&km<100&&fare===(MIN_FARES[v.key]||0);
+    return `<div class="h-fare-row"><span>${v.icon} ${v.name}</span><span>₹${fare.toLocaleString('en-IN')}${isMin?' <small style="opacity:.6;font-size:.7rem">(min)</small>':''}</span></div>`;
   }).join('');
 }
 
@@ -1715,6 +1800,19 @@ function calcHeroFare(){
 let mStep = 1;
 
 function openModal(){
+  // ── Reset all booking state so fresh each time ──
+  S.vehicle=null; S.vehicleName=''; S.rate=0; S.totalFare=0; S.advAmt=0;
+  S.distKm=0; S.name=''; S.phone=''; S.email=''; S.notes='';
+  S.bookingId=''; S.otp=''; S.retdate=''; S.stop='';
+  // Reset multi-city stops
+  S.extraCities=[]; _renderExtraCities();
+  // Clear input fields
+  ['m-pu','m-dr','m-dt','m-tm','m-ret','m-ret-tm','m-stop'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  // Clear error states & distance badge
+  ['fg-pu','fg-dr','fg-dt','fg-tm'].forEach(id=>document.getElementById(id)?.classList.remove('err'));
+  const db=document.getElementById('dist-badge'); if(db) db.classList.remove('show');
   document.getElementById('bookModal').classList.add('open');
   document.body.style.overflow='hidden';
   goStep(1);
@@ -1769,11 +1867,13 @@ function step1next(){
   S.date = document.getElementById('m-dt').value;
   S.time = document.getElementById('m-tm').value;
   S.pax  = document.getElementById('m-pax').value;
+  S.retdate = document.getElementById('m-ret')?.value || '';
   let ok=true;
   if(!S.pu){document.getElementById('fg-pu').classList.add('err');ok=false;}else document.getElementById('fg-pu').classList.remove('err');
   if(!S.dr){document.getElementById('fg-dr').classList.add('err');ok=false;}else document.getElementById('fg-dr').classList.remove('err');
   if(!S.date){document.getElementById('fg-dt').classList.add('err');ok=false;}else document.getElementById('fg-dt').classList.remove('err');
   if(!S.time){document.getElementById('fg-tm').classList.add('err');ok=false;}else document.getElementById('fg-tm').classList.remove('err');
+  if(S.trip==='roundtrip'&&!S.retdate){toast('⚠️ Please select a return date for round trip');ok=false;}
   if(ok){if(!S.distKm)fallbackDist();goStep(2);}
 }
 
@@ -1795,21 +1895,55 @@ function step3next(){
 }
 
 // ══ CAB RESULTS ══
-function buildCabResults(){
-  const isRound = S.trip==='roundtrip';
-  const km = S.distKm||50;
-  document.getElementById('rs-pu').textContent   = S.pu||'—';
-  document.getElementById('rs-dr').textContent   = S.dr||'—';
-  document.getElementById('rs-date').textContent = S.date ? fmtDate(S.date)+(S.time?', '+fmtTime(S.time):'') : '—';
-  document.getElementById('rs-type').textContent = isRound?'Round Trip':'One Way';
-  document.getElementById('rs-km').textContent   = `~${km} km${isRound?' × 2 (min 250km/day) = ~'+Math.max(km*2,250)+' km + ₹300 toll/tax/driver TA':' = ~'+km+' km'}`;
+function calcRoundTripDays(){
+  const d1=S.date    ||document.getElementById('m-dt')?.value||'';
+  const d2=S.retdate ||document.getElementById('m-ret')?.value||'';
+  if(!d1||!d2) return 1;
+  const ms=new Date(d2)-new Date(d1);
+  return Math.max(1,Math.round(ms/86400000));
+}
 
-  document.getElementById('cabList').innerHTML = VEHICLES.map((v,i) => {
-    const totalKm = isRound ? Math.max(km*2, 250) : km;
-    const fare = Math.ceil(totalKm * v.rate) + (isRound?300:0);
-    const adv  = Math.ceil(fare * 0.10 / 10) * 10;
+function buildCabResults(){
+  const isRound=S.trip==='roundtrip';
+  const retEl=document.getElementById('m-ret');
+  if(retEl&&retEl.value) S.retdate=retEl.value;
+  const km=S.distKm||50;
+  const numDays=isRound?calcRoundTripDays():1;
+  const extraList=S.extraCities&&S.extraCities.length?S.extraCities:[];
+
+  document.getElementById('rs-pu').textContent  =S.pu||'—';
+  document.getElementById('rs-dr').textContent  =S.dr||'—';
+  document.getElementById('rs-date').textContent=S.date?fmtDate(S.date)+(S.time?', '+fmtTime(S.time):''):'—';
+  document.getElementById('rs-type').textContent=isRound?`Round Trip${extraList.length?' · '+(extraList.length)+' extra stop'+(extraList.length>1?'s':''):''}` :'One Way';
+
+  const MIN_KM_DAY=250;
+  if(isRound){
+    const kmPerDay=Math.max(km*2,MIN_KM_DAY);
+    const totalKm=kmPerDay*numDays;
+    document.getElementById('rs-km').textContent=
+      `~${km} km × 2 × ${numDays} day${numDays>1?'s':''} (min ${MIN_KM_DAY}km/day) = ~${totalKm} km + ₹${numDays*300} driver allowance`+
+      (extraList.length?` · Via: ${extraList.join(' → ')}`:'');
+  } else {
+    document.getElementById('rs-km').textContent=`~${km} km`;
+  }
+
+  document.getElementById('cabList').innerHTML=VEHICLES.map((v,i)=>{
+    let fare;
+    if(isRound){
+      const kmPerDay=Math.max(km*2,MIN_KM_DAY);
+      const totalKm=kmPerDay*numDays;
+      fare=Math.ceil(totalKm*v.rateRound)+(numDays*300);
+    } else {
+      // One-way: apply minimum flat fare if under 100 km
+      const perKmFare=Math.ceil(km*v.rate);
+      const minFare=MIN_FARES[v.key]||0;
+      fare=km<100?Math.max(perKmFare,minFare):perKmFare;
+    }
+    const adv=Math.ceil(fare*0.10/10)*10;
+    const rateLabel=isRound?v.rateRound:v.rate;
+    const isShortMin=!isRound&&km<100&&fare===(MIN_FARES[v.key]||0);
     return `
-    <div class="cab-card" id="cc-${v.key}" onclick="selectCab('${v.key}','${v.name.replace(/'/g,"\\'")}',${v.rate},${fare},${adv})" style="animation-delay:${i*0.07}s">
+    <div class="cab-card" id="cc-${v.key}" onclick="selectCab('${v.key}','${v.name.replace(/'/g,"\\'")}',${rateLabel},${fare},${adv})" style="animation-delay:${i*0.07}s">
       <div class="cab-icon">${v.icon}</div>
       <div class="cab-info">
         <div class="cab-name">${v.name}<span class="cab-badge">${v.badge}</span></div>
@@ -1817,13 +1951,14 @@ function buildCabResults(){
         <div class="cab-specs">
           <span class="cab-spec">👥 ${v.seats} Seats</span>
           <span class="cab-spec">❄️ AC</span>
-          <span class="cab-spec">₹${v.rate}/km</span>
-          ${isRound?'<span class="cab-spec">🔄 Return incl.</span>':''}
+          <span class="cab-spec">${isShortMin?'Min fare':'₹'+rateLabel+'/km'}</span>
+          ${isRound?`<span class="cab-spec">🔄 ${numDays} day${numDays>1?'s':''}</span>`:''}
+          ${isRound&&extraList.length?`<span class="cab-spec">🏙️ ${extraList.length} stop${extraList.length>1?'s':''}</span>`:''}
         </div>
       </div>
       <div class="cab-fare">
         <div class="cab-total">₹${fare.toLocaleString('en-IN')}</div>
-        <div class="cab-rate">Est. total fare</div>
+        <div class="cab-rate">${isShortMin?'Minimum fare':'Est. total fare'}</div>
         <div class="cab-adv">10% adv: ₹${adv}</div>
         <button class="cab-select-btn">SELECT</button>
       </div>
@@ -1891,20 +2026,23 @@ function verifyOTP(){
 }
 
 function buildSummaryHTML(){
+  const extraList=S.extraCities&&S.extraCities.length?S.extraCities:[];
   return `
     <div class="bk-row"><span class="bl">Passenger</span><span class="bv">${S.name} · +91 ${S.phone}</span></div>
     <div class="bk-row"><span class="bl">Vehicle</span><span class="bv">${S.vehicleName} · ₹${S.rate}/km</span></div>
     <div class="bk-row"><span class="bl">Trip</span><span class="bv">${S.trip==='roundtrip'?'Round Trip':'One Way'}</span></div>
     <div class="bk-row"><span class="bl">Pickup</span><span class="bv">${S.pu}</span></div>
+    ${extraList.map((c,i)=>`<div class="bk-row"><span class="bl">Stop ${i+1}</span><span class="bv">${c}</span></div>`).join('')}
     <div class="bk-row"><span class="bl">Drop</span><span class="bv">${S.dr}</span></div>
     <div class="bk-row"><span class="bl">Date & Time</span><span class="bv">${fmtDate(S.date)} at ${fmtTime(S.time)}</span></div>
+    ${S.retdate?`<div class="bk-row"><span class="bl">Return Date</span><span class="bv">${fmtDate(S.retdate)}</span></div>`:''}
     <div class="bk-row"><span class="bl">Distance</span><span class="bv">~${S.distKm}km${S.trip==='roundtrip'?' × 2':''}</span></div>
     <div class="bk-row"><span class="bl">Estimated Fare</span><span class="bv" style="color:var(--gold);font-size:1.05rem">₹${S.totalFare.toLocaleString('en-IN')}</span></div>`;
 }
 
 function notifyAdmin(){
   if(WORKER && WORKER && !WORKER.includes('YOUR-SUBDOMAIN')){
-    fetch(`${WORKER}/api/booking/notify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking:{id:S.bookingId,name:S.name,phone:S.phone,email:S.email,vehicleName:S.vehicleName,tripType:S.trip,pickup:S.pu,drop:S.dr,date:S.date,time:S.time,pax:S.pax,distKm:S.distKm,totalFare:S.totalFare,advAmt:S.advAmt,notes:S.notes}})}).catch(()=>{});
+    fetch(`${WORKER}/api/booking/notify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking:{id:S.bookingId,name:S.name,phone:S.phone,email:S.email,vehicleName:S.vehicleName,tripType:S.trip,pickup:S.pu,drop:S.dr,extraCities:S.extraCities||[],date:S.date,time:S.time,retdate:S.retdate,pax:S.pax,distKm:S.distKm,totalFare:S.totalFare,advAmt:S.advAmt,notes:S.notes}})}).catch(()=>{});
   }
 }
 
@@ -1915,17 +2053,20 @@ function sendWAConfirm(){
 
 // ══ HERO SEARCH ══
 function heroSearch(){
-  const pu = document.getElementById('h-pu').value;
-  const dr = document.getElementById('h-dr').value;
-  const dt = document.getElementById('h-dt').value;
-  const tm = document.getElementById('h-tm').value;
+  const pu=document.getElementById('h-pu').value;
+  const dr=document.getElementById('h-dr').value;
+  const dt=document.getElementById('h-dt').value;
+  const tm=document.getElementById('h-tm').value;
+  const ret=document.getElementById('h-ret')?.value||'';
   if(!pu||!dr){toast('⚠️ Please enter pickup and drop locations');return;}
-  S.pu=pu; S.dr=dr; S.date=dt; S.time=tm; S.trip=S.hTrip;
+  S.pu=pu;S.dr=dr;S.date=dt;S.time=tm;S.trip=S.hTrip;S.retdate=ret;
   setTrip(S.hTrip);
+  // Pre-fill modal fields
   document.getElementById('m-pu').value=pu;
   document.getElementById('m-dr').value=dr;
   if(dt) document.getElementById('m-dt').value=dt;
   if(tm) document.getElementById('m-tm').value=tm;
+  if(ret&&document.getElementById('m-ret')) document.getElementById('m-ret').value=ret;
   openModal();
   if(S.distKm) setTimeout(()=>goStep(2),200);
 }
