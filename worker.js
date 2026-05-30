@@ -35,9 +35,10 @@ export default {
     const url = new URL(request.url);
 
     // ── CORS HEADERS ──
-    const allowedOrigin = env.ALLOWED_ORIGIN || '*';
+    // Places & Distance are public read-only (key is server-side).
+    // Allow all origins so the site works from any domain/localhost/file.
     const corsHeaders = {
-      'Access-Control-Allow-Origin': allowedOrigin,
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',
@@ -191,6 +192,7 @@ export default {
           `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
           `?input=${encodeURIComponent(input)}` +
           `&components=country:in` +
+          `&language=en` +
           `&sessiontoken=${sessiontoken}` +
           `&key=${env.GOOGLE_MAPS_KEY}`;
 
