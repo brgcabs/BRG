@@ -103,8 +103,8 @@ a{text-decoration:none;color:inherit} ul{list-style:none} button{cursor:pointer;
 .trip-type-btn.on .tt-label{color:var(--black)}
 
 /* ══ AUTOCOMPLETE ══ */
-.ac-wrap{position:relative}
-.ac-dd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--white);border:1.5px solid rgba(0,0,0,.1);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.14);z-index:300;max-height:230px;overflow-y:auto;display:none}
+.ac-wrap{position:relative;overflow:visible}
+.ac-dd{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--white);border:1.5px solid rgba(0,0,0,.1);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.14);z-index:9999;max-height:230px;overflow-y:auto;display:none}
 .ac-dd.open{display:block}
 .ac-item{padding:10px 14px;font-size:.86rem;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(0,0,0,.04);transition:.2s}
 .ac-item:last-child{border:none} .ac-item:hover{background:var(--light)}
@@ -240,14 +240,14 @@ a{text-decoration:none;color:inherit} ul{list-style:none} button{cursor:pointer;
 
 /* Hero form */
 .h-form-wrap{animation:fadeUp .9s .3s ease both}
-.h-form{background:rgba(255,255,255,.06);backdrop-filter:blur(18px);border:1px solid rgba(245,197,24,.17);border-radius:var(--rl);padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.h-form{background:rgba(255,255,255,.06);backdrop-filter:blur(18px);border:1px solid rgba(245,197,24,.17);border-radius:var(--rl);padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:visible}
 .h-form h3{font-family:var(--font-h);font-size:1.6rem;color:var(--gold);letter-spacing:2px;margin-bottom:16px;text-align:center}
 .h-form .fg label{color:rgba(255,255,255,.58)}
 .h-form .fg input,.h-form .fg select{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--white)}
 .h-form .fg input::placeholder{color:rgba(255,255,255,.33)}
 .h-form .fg input:focus,.h-form .fg select:focus{border-color:var(--gold);background:rgba(245,197,24,.07)}
 .h-form .fg select option{background:#111;color:#fff}
-.h-form .ac-dd{background:#1a1a1a;border-color:rgba(255,255,255,.1)}
+.h-form .ac-dd{background:#1a1a1a;border-color:rgba(255,255,255,.1);z-index:9999;position:absolute}
 .h-form .ac-item{color:var(--white);border-color:rgba(255,255,255,.05)}
 .h-form .ac-item:hover{background:rgba(255,255,255,.06)}
 .h-form .ac-item-main{color:var(--white)} .h-form .ac-item-sub{color:rgba(255,255,255,.44)}
@@ -1557,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); } catch(e) {}
 
   document.addEventListener('click', e => {
-    try { if(!e.target.closest('.ac-wrap')) document.querySelectorAll('.ac-dd').forEach(d=>d.classList.remove('open')); } catch(e) {}
+    try { hidePortal(); } catch(e) {}
   });
   try {
     const modal = document.getElementById('bookModal');
@@ -1627,71 +1627,124 @@ function localSearch(q) {
   return scored.slice(0, 9).map(x => x.l);
 }
 
-// Store for pending autocomplete selections (avoids onclick string escaping issues)
-const acPending = {};
+// ══ PORTAL AUTOCOMPLETE ══
+// Renders dropdown in <body> to escape stacking contexts (backdrop-filter, overflow:auto, etc.)
+let acPortal = null;
+let acPortalOnSelect = null;
 
-function renderACItems(dd, items, onSelect) {
-  if(!items.length){ dd.classList.remove('open'); return; }
-  const key = dd.id;
-  acPending[key] = items;
-  dd.innerHTML = items.map((m, i) => {
-    const name = m.n || m.description || '';
-    const sub  = m.s || m.secondary || '';
-    const icon = name.toLowerCase().includes('airport') ? '✈️' : name.toLowerCase().includes('station') ? '🚉' : '📍';
-    return `<div class="ac-item" data-idx="${i}" data-dd="${key}"><span>${icon}</span><div><div class="ac-item-main">${name}</div><div class="ac-item-sub">${sub}</div></div></div>`;
-  }).join('');
-  dd.querySelectorAll('.ac-item').forEach(el => {
-    el.addEventListener('mousedown', e => {
-      e.preventDefault(); // prevent blur before click
-      const idx = +el.dataset.idx;
-      const chosen = (acPending[key] || [])[idx];
-      if(chosen) onSelect(chosen.n || chosen.description || '');
+function getOrCreatePortal() {
+  if(!acPortal) {
+    acPortal = document.createElement('div');
+    acPortal.id = 'ac-portal';
+    acPortal.style.cssText = [
+      'position:fixed',
+      'z-index:99999',
+      'background:#fff',
+      'border:1.5px solid rgba(0,0,0,.1)',
+      'border-radius:12px',
+      'box-shadow:0 12px 40px rgba(0,0,0,.18)',
+      'max-height:260px',
+      'overflow-y:auto',
+      'display:none',
+      'font-family:DM Sans,sans-serif',
+      'min-width:260px',
+    ].join(';');
+    document.body.appendChild(acPortal);
+
+    // Close on outside click
+    document.addEventListener('mousedown', e => {
+      if(acPortal && !acPortal.contains(e.target)) hidePortal();
     });
-  });
-  dd.classList.add('open');
+    // Close on scroll
+    window.addEventListener('scroll', hidePortal, true);
+  }
+  return acPortal;
 }
 
-function showACLoading(dd) {
-  dd.innerHTML = '<div style="padding:12px 14px;font-size:.82rem;color:#888;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border:2px solid #ddd;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;flex-shrink:0"></span>Searching all India…</div>';
-  dd.classList.add('open');
+function showPortalAt(inp, html, onSelect) {
+  const portal = getOrCreatePortal();
+  acPortalOnSelect = onSelect;
+  const rect = inp.getBoundingClientRect();
+  portal.style.left   = rect.left + 'px';
+  portal.style.top    = (rect.bottom + 4) + 'px';
+  portal.style.width  = rect.width + 'px';
+  portal.style.display = 'block';
+  portal.innerHTML = html;
+  portal.querySelectorAll('.ac-item').forEach((el, i) => {
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const name = el.dataset.name;
+      if(name && acPortalOnSelect) acPortalOnSelect(name);
+      hidePortal();
+    });
+  });
+}
+
+function hidePortal() {
+  if(acPortal) acPortal.style.display = 'none';
+}
+
+function buildPortalHTML(items, isDark) {
+  if(!items.length) return '<div style="padding:12px 14px;font-size:.82rem;color:#999">No results found</div>';
+  const bg    = isDark ? '#1a1a1a' : '#fff';
+  const color = isDark ? '#fff'    : '#111';
+  const sub   = isDark ? 'rgba(255,255,255,.44)' : '#777';
+  const hover = isDark ? 'rgba(255,255,255,.06)' : '#f6f6f6';
+  return items.map(m => {
+    const name = m.n || m.description || '';
+    const s    = m.s || m.secondary  || '';
+    const icon = name.toLowerCase().includes('airport') ? '✈️' : name.toLowerCase().includes('station') ? '🚉' : '📍';
+    const safe = name.replace(/"/g, '&quot;');
+    return `<div class="ac-item" data-name="${safe}" style="padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.05);background:${bg};color:${color}" onmouseover="this.style.background='${hover}'" onmouseout="this.style.background='${bg}'"><span>${icon}</span><div><div style="font-weight:600;font-size:.86rem">${name}</div><div style="font-size:.73rem;color:${sub}">${s}</div></div></div>`;
+  }).join('');
+}
+
+function buildLoadingHTML(isDark) {
+  const color = isDark ? '#aaa' : '#888';
+  const bg    = isDark ? '#1a1a1a' : '#fff';
+  return `<div style="padding:12px 14px;font-size:.82rem;color:${color};display:flex;align-items:center;gap:8px;background:${bg}"><span style="width:14px;height:14px;border:2px solid #ddd;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;flex-shrink:0"></span>Searching all India…</div>`;
+}
+
+function attachAC(inp, isDark, onSelect) {
+  if(!inp) return;
+  inp.addEventListener('input', () => {
+    const q = inp.value.trim();
+    if(q.length < 2){ hidePortal(); return; }
+    clearTimeout(acTimers[inp.id]);
+    showPortalAt(inp, buildLoadingHTML(isDark), null);
+    acTimers[inp.id] = setTimeout(() => {
+      fetchPlaces(q, items => {
+        if(!items.length){ hidePortal(); return; }
+        showPortalAt(inp, buildPortalHTML(items, isDark), onSelect);
+      });
+    }, 300);
+  });
+  inp.addEventListener('blur', () => setTimeout(hidePortal, 150));
 }
 
 function setupAC(inputId, dropId, stateKey){
   const inp = document.getElementById(inputId);
-  const dd  = document.getElementById(dropId);
-  if(!inp) return;
-  inp.addEventListener('input', () => {
-    const q = inp.value.trim();
-    if(q.length < 2){ dd.classList.remove('open'); return; }
-    clearTimeout(acTimers[inputId]);
-    showACLoading(dd);
-    acTimers[inputId] = setTimeout(() => {
-      fetchPlaces(q, items => {
-        renderACItems(dd, items, name => {
-          inp.value = name;
-          dd.classList.remove('open');
-          if(stateKey==='pu') S.pu=name; else S.dr=name;
-          estimateDist();
-          if(mStep===2) buildCabResults();
-        });
-      });
-    }, 300);
+  attachAC(inp, false, name => {
+    inp.value = name;
+    if(stateKey==='pu') S.pu=name; else S.dr=name;
+    estimateDist();
+    if(mStep===2) buildCabResults();
   });
 }
 
 function hAC(inputId, dropId){
+  // Called via oninput on hero inputs — delegate to portal system
   const inp = document.getElementById(inputId);
-  const dd  = document.getElementById(dropId);
   if(!inp) return;
   const q = inp.value.trim();
-  if(q.length < 2){ dd.classList.remove('open'); return; }
+  if(q.length < 2){ hidePortal(); return; }
   clearTimeout(acTimers['h_'+inputId]);
-  showACLoading(dd);
+  showPortalAt(inp, buildLoadingHTML(true), null);
   acTimers['h_'+inputId] = setTimeout(() => {
     fetchPlaces(q, items => {
-      renderACItems(dd, items, name => {
+      if(!items.length){ hidePortal(); return; }
+      showPortalAt(inp, buildPortalHTML(items, true), name => {
         inp.value = name;
-        dd.classList.remove('open');
         estimateHeroDist();
       });
     });
