@@ -768,7 +768,7 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
           <div id="stop-wrap" style="display:none;margin-top:8px">
             <label style="font-size:.8rem;font-weight:600;color:var(--gray)">🛑 Stop Location</label>
             <div class="ac-wrap" style="margin-top:4px">
-              <input type="text" id="m-stop" placeholder="Enter stop location…" autocomplete="off" oninput="hAC('m-stop','acd-stop')"/>
+              <input type="text" id="m-stop" placeholder="Enter stop location…" autocomplete="off"/>
               <div class="ac-dd" id="acd-stop"></div>
             </div>
           </div>
@@ -1370,155 +1370,10 @@ const VEHICLES = [
   {key:'tempo',  name:'Tempo Traveller',sub:'12–20 Seater · Force/Mahindra',   icon:'🚌', seats:12, rate:35, rateRound:35, badge:'Group Travel'},
 ];
 
-const LOCATIONS = [
-  // Airports
-  {n:'IGI Airport Terminal 1',s:'New Delhi'},{n:'IGI Airport Terminal 2',s:'New Delhi'},{n:'IGI Airport Terminal 3',s:'New Delhi'},
-  {n:'Chhatrapati Shivaji Airport',s:'Mumbai'},{n:'Kempegowda Airport',s:'Bengaluru'},{n:'Chennai Airport',s:'Chennai'},
-  {n:'Netaji Subhas Airport',s:'Kolkata'},{n:'Rajiv Gandhi Airport',s:'Hyderabad'},{n:'Sardar Patel Airport',s:'Ahmedabad'},
-  {n:'Pune Airport',s:'Pune'},{n:'Jaipur Airport',s:'Jaipur'},{n:'Chandigarh Airport',s:'Chandigarh'},
-  {n:'Amritsar Airport',s:'Amritsar'},{n:'Goa Airport (Dabolim)',s:'Goa'},{n:'Mopa Airport',s:'North Goa'},
-  // Railway Stations
-  {n:'New Delhi Railway Station',s:'Paharganj, New Delhi'},{n:'Hazrat Nizamuddin Railway Stn',s:'New Delhi'},{n:'Old Delhi Railway Station',s:'Chandni Chowk, Delhi'},
-  {n:'Anand Vihar Railway Station',s:'East Delhi'},{n:'Sarai Rohilla Railway Station',s:'North Delhi'},
-  {n:'Mumbai Central',s:'Mumbai'},{n:'Chhatrapati Shivaji Terminus',s:'Mumbai'},{n:'Dadar Railway Station',s:'Mumbai'},
-  {n:'Howrah Junction',s:'Kolkata'},{n:'Sealdah Station',s:'Kolkata'},
-  {n:'Chennai Central',s:'Chennai'},{n:'Chennai Egmore',s:'Chennai'},
-  {n:'Bengaluru City Junction',s:'Bengaluru'},{n:'KSR Bengaluru City',s:'Bengaluru'},
-  {n:'Hyderabad Deccan',s:'Hyderabad'},{n:'Secunderabad Junction',s:'Hyderabad'},
-  {n:'Ahmedabad Junction',s:'Ahmedabad'},{n:'Surat Railway Station',s:'Surat'},
-  {n:'Pune Junction',s:'Pune'},{n:'Nagpur Junction',s:'Nagpur'},
-  {n:'Patna Junction',s:'Patna, Bihar'},{n:'Varanasi Junction',s:'Varanasi, UP'},
-  // ISBT / Bus Stands
-  {n:'Anand Vihar ISBT',s:'East Delhi'},{n:'Kashmere Gate ISBT',s:'North Delhi'},{n:'Sarai Kale Khan ISBT',s:'South Delhi'},
-  // Delhi Areas
-  {n:'Sainik Nagar',s:'Uttam Nagar, West Delhi'},{n:'Uttam Nagar',s:'West Delhi'},{n:'Janakpuri',s:'West Delhi'},
-  {n:'Dwarka Sector 1',s:'South West Delhi'},{n:'Dwarka Sector 10',s:'South West Delhi'},{n:'Dwarka Sector 21',s:'South West Delhi'},
-  {n:'Connaught Place',s:'Central Delhi'},{n:'Karol Bagh',s:'Central Delhi'},{n:'Paharganj',s:'Central Delhi'},
-  {n:'Lajpat Nagar',s:'South Delhi'},{n:'Saket',s:'South Delhi'},{n:'Malviya Nagar',s:'South Delhi'},
-  {n:'Rohini',s:'North West Delhi'},{n:'Pitampura',s:'North West Delhi'},{n:'Rajouri Garden',s:'West Delhi'},
-  {n:'Tilak Nagar',s:'West Delhi'},{n:'Subhash Nagar',s:'West Delhi'},{n:'Palam',s:'South West Delhi'},
-  {n:'Najafgarh',s:'South West Delhi'},{n:'Vikaspuri',s:'West Delhi'},{n:'Punjabi Bagh',s:'West Delhi'},
-  {n:'Laxmi Nagar',s:'East Delhi'},{n:'Preet Vihar',s:'East Delhi'},{n:'Shahdara',s:'East Delhi'},
-  {n:'Vasant Kunj',s:'South Delhi'},{n:'Mehrauli',s:'South Delhi'},{n:'Hauz Khas',s:'South Delhi'},
-  {n:'Greater Kailash',s:'South Delhi'},{n:'Defence Colony',s:'South Delhi'},{n:'Green Park',s:'South Delhi'},
-  {n:'Chandni Chowk',s:'Old Delhi'},{n:'Civil Lines',s:'North Delhi'},{n:'Model Town',s:'North Delhi'},
-  {n:'Shalimar Bagh',s:'North West Delhi'},{n:'Narela',s:'North Delhi'},{n:'Burari',s:'North Delhi'},
-  {n:'Patparganj',s:'East Delhi'},{n:'Geeta Colony',s:'East Delhi'},{n:'Krishna Nagar',s:'East Delhi'},
-  // NCR
-  {n:'Noida Sector 18',s:'Uttar Pradesh'},{n:'Noida Sector 62',s:'Uttar Pradesh'},{n:'Noida City Centre',s:'UP'},
-  {n:'Noida Sector 125',s:'Uttar Pradesh'},{n:'Noida Sector 137',s:'Uttar Pradesh'},{n:'Noida',s:'Uttar Pradesh'},
-  {n:'Greater Noida',s:'Uttar Pradesh'},{n:'Greater Noida West',s:'Uttar Pradesh'},
-  {n:'Gurgaon',s:'Haryana'},{n:'Gurugram',s:'Haryana'},{n:'Gurugram Cyber City',s:'Haryana'},
-  {n:'Faridabad',s:'Haryana'},{n:'Ballabhgarh',s:'Faridabad, Haryana'},
-  {n:'Ghaziabad',s:'Uttar Pradesh'},{n:'Indirapuram',s:'Ghaziabad, UP'},{n:'Vasundhara',s:'Ghaziabad, UP'},
-  {n:'Vaishali',s:'Ghaziabad, UP'},{n:'Meerut',s:'Uttar Pradesh · ~70 km'},
-  {n:'Sonipat',s:'Haryana · ~45 km'},{n:'Panipat',s:'Haryana · ~90 km'},
-  {n:'Rohtak',s:'Haryana · ~70 km'},{n:'Bahadurgarh',s:'Haryana · ~35 km'},
-  {n:'Karnal',s:'Haryana · ~130 km'},{n:'Hisar',s:'Haryana · ~170 km'},
-  // Rajasthan
-  {n:'Jaipur',s:'Rajasthan · ~280 km'},{n:'Ajmer',s:'Rajasthan · ~390 km'},
-  {n:'Pushkar',s:'Rajasthan · ~400 km'},{n:'Jodhpur',s:'Rajasthan · ~610 km'},
-  {n:'Udaipur',s:'Rajasthan · ~685 km'},{n:'Kota',s:'Rajasthan · ~500 km'},
-  {n:'Bikaner',s:'Rajasthan · ~460 km'},{n:'Alwar',s:'Rajasthan · ~165 km'},
-  {n:'Bharatpur',s:'Rajasthan · ~195 km'},{n:'Jaisalmer',s:'Rajasthan · ~820 km'},
-  // UP
-  {n:'Agra',s:'UP · ~230 km'},{n:'Mathura',s:'UP · ~165 km'},{n:'Vrindavan',s:'UP · ~155 km'},
-  {n:'Lucknow',s:'UP · ~555 km'},{n:'Varanasi',s:'UP · ~820 km'},{n:'Prayagraj',s:'UP · ~640 km'},
-  {n:'Kanpur',s:'UP · ~490 km'},{n:'Gorakhpur',s:'UP · ~760 km'},{n:'Aligarh',s:'UP · ~145 km'},
-  {n:'Bareilly',s:'UP · ~265 km'},{n:'Moradabad',s:'UP · ~175 km'},{n:'Ayodhya',s:'UP · ~640 km'},
-  // Bihar / East
-  {n:'Patna',s:'Bihar · ~1080 km'},{n:'Gaya',s:'Bihar · ~1180 km'},{n:'Muzaffarpur',s:'Bihar'},
-  {n:'Bhagalpur',s:'Bihar'},{n:'Bodh Gaya',s:'Bihar · ~1185 km'},
-  // Himachal / Punjab
-  {n:'Chandigarh',s:'Punjab · ~250 km'},{n:'Amritsar',s:'Punjab · ~450 km'},{n:'Ludhiana',s:'Punjab · ~310 km'},
-  {n:'Jalandhar',s:'Punjab · ~380 km'},{n:'Patiala',s:'Punjab · ~270 km'},
-  {n:'Shimla',s:'Himachal · ~360 km'},{n:'Manali',s:'Himachal · ~570 km'},{n:'Dharamshala',s:'Himachal · ~490 km'},
-  {n:'Kasol',s:'Himachal · ~530 km'},{n:'Dalhousie',s:'Himachal · ~550 km'},
-  {n:'Spiti Valley',s:'Himachal · ~700 km'},{n:'Kullu',s:'Himachal · ~540 km'},
-  // Uttarakhand
-  {n:'Dehradun',s:'Uttarakhand · ~300 km'},{n:'Haridwar',s:'Uttarakhand · ~220 km'},{n:'Rishikesh',s:'Uttarakhand · ~240 km'},
-  {n:'Mussoorie',s:'Uttarakhand · ~310 km'},{n:'Nainital',s:'Uttarakhand · ~310 km'},{n:'Jim Corbett',s:'Uttarakhand · ~245 km'},
-  {n:'Lansdowne',s:'Uttarakhand · ~255 km'},{n:'Auli',s:'Uttarakhand · ~490 km'},
-  {n:'Badrinath',s:'Uttarakhand · ~540 km'},{n:'Kedarnath',s:'Uttarakhand · ~460 km'},
-  {n:'Gangotri',s:'Uttarakhand · ~485 km'},{n:'Yamunotri',s:'Uttarakhand · ~430 km'},
-  {n:'Rudraprayag',s:'Uttarakhand · ~405 km'},{n:'Chamoli',s:'Uttarakhand · ~480 km'},
-  // J&K
-  {n:'Vaishno Devi',s:'Jammu · ~700 km'},{n:'Jammu',s:'J&K · ~590 km'},{n:'Katra',s:'J&K · ~685 km'},
-  {n:'Srinagar',s:'J&K · ~870 km'},{n:'Pahalgam',s:'J&K · ~950 km'},{n:'Gulmarg',s:'J&K · ~890 km'},
-  // Maharashtra
-  {n:'Mumbai',s:'Maharashtra · ~1450 km'},{n:'Pune',s:'Maharashtra · ~1490 km'},
-  {n:'Nashik',s:'Maharashtra · ~1420 km'},{n:'Nagpur',s:'Maharashtra · ~1100 km'},
-  {n:'Aurangabad',s:'Maharashtra · ~1350 km'},{n:'Shirdi',s:'Maharashtra · ~1390 km'},
-  {n:'Lonavala',s:'Maharashtra · ~1470 km'},{n:'Mahabaleshwar',s:'Maharashtra · ~1530 km'},
-  // Gujarat
-  {n:'Ahmedabad',s:'Gujarat · ~940 km'},{n:'Surat',s:'Gujarat · ~1210 km'},
-  {n:'Vadodara',s:'Gujarat · ~1030 km'},{n:'Rajkot',s:'Gujarat · ~1200 km'},
-  {n:'Dwarka',s:'Gujarat · ~1380 km'},{n:'Somnath',s:'Gujarat · ~1330 km'},
-  // Madhya Pradesh
-  {n:'Bhopal',s:'MP · ~780 km'},{n:'Indore',s:'MP · ~1000 km'},{n:'Gwalior',s:'MP · ~320 km'},
-  {n:'Jabalpur',s:'MP · ~1000 km'},{n:'Ujjain',s:'MP · ~1020 km'},{n:'Khajuraho',s:'MP · ~760 km'},
-  {n:'Orchha',s:'MP · ~340 km'},{n:'Pachmarhi',s:'MP · ~960 km'},
-  // South India
-  {n:'Bengaluru',s:'Karnataka · ~2150 km'},{n:'Bangalore',s:'Karnataka · ~2150 km'},
-  {n:'Mysuru',s:'Karnataka · ~2200 km'},{n:'Mysore',s:'Karnataka · ~2200 km'},
-  {n:'Hampi',s:'Karnataka · ~2080 km'},{n:'Coorg',s:'Karnataka · ~2350 km'},
-  {n:'Chennai',s:'Tamil Nadu · ~2200 km'},{n:'Madurai',s:'Tamil Nadu · ~2500 km'},
-  {n:'Coimbatore',s:'Tamil Nadu · ~2350 km'},{n:'Ooty',s:'Tamil Nadu · ~2380 km'},
-  {n:'Hyderabad',s:'Telangana · ~1550 km'},{n:'Warangal',s:'Telangana · ~1600 km'},
-  {n:'Visakhapatnam',s:'Andhra Pradesh · ~1700 km'},{n:'Vijayawada',s:'Andhra Pradesh · ~1750 km'},
-  {n:'Tirupati',s:'Andhra Pradesh · ~2170 km'},
-  {n:'Kochi',s:'Kerala · ~2600 km'},{n:'Thiruvananthapuram',s:'Kerala · ~2800 km'},
-  {n:'Munnar',s:'Kerala · ~2680 km'},{n:'Alleppey',s:'Kerala · ~2650 km'},
-  // Goa
-  {n:'Goa',s:'Goa · ~1900 km'},{n:'Panaji',s:'Goa · ~1900 km'},{n:'Calangute',s:'North Goa'},
-  // West Bengal / Odisha
-  {n:'Kolkata',s:'West Bengal · ~1500 km'},{n:'Darjeeling',s:'West Bengal · ~1650 km'},
-  {n:'Siliguri',s:'West Bengal · ~1600 km'},{n:'Puri',s:'Odisha · ~1700 km'},
-  {n:'Bhubaneswar',s:'Odisha · ~1680 km'},{n:'Konark',s:'Odisha · ~1720 km'},
-  // North East
-  {n:'Guwahati',s:'Assam · ~1960 km'},{n:'Shillong',s:'Meghalaya · ~2050 km'},
-];
-
-const CITY_DIST = {
-  // NCR & Nearby
-  'noida':30,'gurgaon':35,'gurugram':35,'faridabad':40,'ghaziabad':30,'greater noida':42,
-  'airport':25,'igi':25,'meerut':70,'sonipat':45,'panipat':90,'rohtak':70,'bahadurgarh':35,
-  'karnal':130,'hisar':170,'alwar':165,'bharatpur':195,
-  // Rajasthan
-  'jaipur':280,'ajmer':390,'pushkar':400,'jodhpur':610,'udaipur':685,'kota':500,
-  'bikaner':460,'jaisalmer':820,
-  // UP
-  'agra':230,'mathura':165,'vrindavan':155,'lucknow':555,'varanasi':820,'prayagraj':640,
-  'kanpur':490,'gorakhpur':760,'aligarh':145,'bareilly':265,'moradabad':175,'ayodhya':640,
-  // Bihar
-  'patna':1080,'gaya':1180,'bodh gaya':1185,'muzaffarpur':1200,'bhagalpur':1350,
-  // Himachal / Punjab
-  'chandigarh':250,'amritsar':450,'ludhiana':310,'jalandhar':380,'patiala':270,
-  'shimla':360,'manali':570,'dharamshala':490,'kasol':530,'dalhousie':550,'kullu':540,
-  // Uttarakhand
-  'dehradun':300,'haridwar':220,'rishikesh':240,'mussoorie':310,'nainital':310,'corbett':245,
-  'lansdowne':255,'auli':490,'badrinath':540,'kedarnath':460,'gangotri':485,'yamunotri':430,
-  // J&K
-  'vaishno devi':700,'jammu':590,'katra':685,'srinagar':870,
-  // MP
-  'gwalior':320,'bhopal':780,'indore':1000,'jabalpur':1000,'ujjain':1020,'khajuraho':760,'orchha':340,
-  // Maharashtra
-  'mumbai':1450,'pune':1490,'nashik':1420,'nagpur':1100,'aurangabad':1350,'shirdi':1390,
-  'lonavala':1470,'mahabaleshwar':1530,
-  // Gujarat
-  'ahmedabad':940,'surat':1210,'vadodara':1030,'rajkot':1200,
-  // South
-  'hyderabad':1550,'bengaluru':2150,'bangalore':2150,'mysuru':2200,'mysore':2200,
-  'chennai':2200,'madurai':2500,'coimbatore':2350,'ooty':2380,'kochi':2600,
-  'visakhapatnam':1700,'vijayawada':1750,'tirupati':2170,
-  // Goa / East
-  'goa':1900,'panaji':1900,'kolkata':1500,'darjeeling':1650,'siliguri':1600,
-  'puri':1700,'bhubaneswar':1680,'guwahati':1960,'shillong':2050,
-};
 
 // ── STATE ──
 const S = {
-  trip:'oneway', pu:'', dr:'', date:'', time:'', retdate:'', pax:'3-4 Passengers',
+  trip:'oneway', pu:'', dr:'', stop:'', date:'', time:'', retdate:'', pax:'3-4 Passengers',
   vehicle:null, vehicleName:'', rate:0, distKm:0, totalFare:0, advAmt:0,
   name:'', phone:'', email:'', notes:'', bookingId:'', otp:'', step:1, hTrip:'oneway',
 };
@@ -1554,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { buildReviews(); } catch(e) {}
   try { buildFAQ(); } catch(e) {}
   try { initScroll(); } catch(e) {}
-  try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); } catch(e) {}
+  try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); setupACStop(); } catch(e) {}
 
   // Dropdown closed by its own outside-click handler (mousedown on body)
   try {
@@ -1587,24 +1442,39 @@ function updateMBtnLabel(){document.getElementById('mBtnNext').textContent = S.s
 // ══ AUTOCOMPLETE ══
 const acTimers = {};
 
-// ── Fetch from Worker (Google Places API — all India: cities, towns, villages, landmarks)
-function fetchPlaces(q, callback) {
-  const token = Math.random().toString(36).substr(2,9);
+// ── Per-input request IDs — prevents stale fetch results from re-opening a closed portal
+const _reqIds = {};
+
+// ── Fetch places via Google Places API (all India — every city, town, village, landmark).
+//    Per-input request IDs prevent stale responses from a slower earlier fetch
+//    overwriting the results of a faster later one.
+function fetchPlaces(q, inpId, callback) {
+  if (!WORKER || WORKER.includes('YOUR-SUBDOMAIN')) {
+    return callback([]);
+  }
+
+  const myId = (_reqIds[inpId] = (_reqIds[inpId] || 0) + 1);
+  const token = Math.random().toString(36).substr(2, 9);
+
   fetch(`${WORKER}/api/places?input=${encodeURIComponent(q)}&sessiontoken=${token}`)
     .then(r => r.json())
     .then(data => {
+      if (_reqIds[inpId] !== myId) return; // newer request already in flight — discard
       callback((data.predictions || []).map(p => ({
         n: p.description,
         s: p.secondary || p.main_text || ''
       })));
     })
-    .catch(() => callback([]));
+    .catch(() => {
+      if (_reqIds[inpId] === myId) callback([]);
+    });
 }
 
 // ── Portal: single <div> appended to <body>, escapes all stacking contexts
 let _portal = null;
 let _portalCb = null;
 let _activeInp = null;
+let _currentInp = null; // tracks which input's results are currently shown
 
 function _getPortal() {
   if (!_portal) {
@@ -1627,6 +1497,7 @@ function _positionPortal(inp) {
 }
 
 function _showLoading(inp) {
+  _currentInp = inp; // mark this input as the one awaiting results
   const p = _getPortal();
   _positionPortal(inp);
   p.innerHTML = '<div style="padding:12px 16px;color:#aaa;font-size:.83rem;display:flex;align-items:center;gap:10px"><span style="width:13px;height:13px;border:2px solid #444;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>Searching across India…</div>';
@@ -1634,6 +1505,8 @@ function _showLoading(inp) {
 }
 
 function _showResults(inp, items, onPick) {
+  // Discard if this result belongs to an input that is no longer active
+  if (_currentInp !== inp) return;
   const p = _getPortal();
   _positionPortal(inp);
   if (!items.length) { p.style.display = 'none'; return; }
@@ -1665,6 +1538,7 @@ function _showResults(inp, items, onPick) {
 function _closePortal() {
   if (_portal) _portal.style.display = 'none';
   _portalCb = null;
+  _currentInp = null; // no portal is showing for any input
 }
 
 // Close when clicking outside both input and portal
@@ -1679,20 +1553,26 @@ document.addEventListener('mousedown', e => {
 // ── Attach AC to any input
 function _attachAC(inp, onPick) {
   if (!inp) return;
-  _activeInp = inp;
+  // NOTE: _activeInp is NOT set here at registration time (that caused Bug 3).
+  //       It is only set on actual user focus events below.
   inp.addEventListener('input', () => {
     const q = inp.value.trim();
-    if (q.length < 2) { _closePortal(); return; }
+    if (q.length < 2) { _currentInp = null; _closePortal(); return; }
     clearTimeout(acTimers[inp.id]);
     _showLoading(inp);
     acTimers[inp.id] = setTimeout(() => {
-      fetchPlaces(q, items => _showResults(inp, items, name => {
+      fetchPlaces(q, inp.id, items => _showResults(inp, items, name => {
         inp.value = name;
         onPick(name);
       }));
     }, 350);
   });
   inp.addEventListener('focus', () => { _activeInp = inp; });
+  // Close portal when input loses focus (200 ms delay lets a mousedown on a
+  // portal row fire first, so selection still works before the portal closes)
+  inp.addEventListener('blur', () => {
+    setTimeout(() => { if (_activeInp === inp) _closePortal(); }, 200);
+  });
 }
 
 // ── Modal inputs (called from DOMContentLoaded)
@@ -1705,17 +1585,31 @@ function setupAC(inputId, dropId, stateKey) {
   });
 }
 
+// ── Stop-location input inside the modal (uses modal distance estimator, not hero)
+function setupACStop() {
+  const inp = document.getElementById('m-stop');
+  _attachAC(inp, name => { S.stop = name; });
+}
+
 // ── Hero inputs (called from oninput="hAC(...)" inline attribute)
+const _hACBlurAttached = new Set();
 function hAC(inputId, dropId) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
   _activeInp = inp;
+  // Attach blur handler only once per input (these use inline oninput, not _attachAC)
+  if (!_hACBlurAttached.has(inputId)) {
+    _hACBlurAttached.add(inputId);
+    inp.addEventListener('blur', () => {
+      setTimeout(() => { if (_activeInp === inp) _closePortal(); }, 200);
+    });
+  }
   const q = inp.value.trim();
-  if (q.length < 2) { _closePortal(); return; }
+  if (q.length < 2) { _currentInp = null; _closePortal(); return; }
   clearTimeout(acTimers['h_' + inputId]);
   _showLoading(inp);
   acTimers['h_' + inputId] = setTimeout(() => {
-    fetchPlaces(q, items => _showResults(inp, items, name => {
+    fetchPlaces(q, inp.id, items => _showResults(inp, items, name => {
       inp.value = name;
       estimateHeroDist();
     }));
@@ -1748,10 +1642,9 @@ function estimateDist(){
 }
 
 function fallbackDist(){
-  const low = (S.dr||'').toLowerCase();
-  let km = 0;
-  for(const [k,v] of Object.entries(CITY_DIST)){if(low.includes(k)){km=v;break;}}
-  S.distKm = km || 50;
+  // Distance API unavailable — keep any previously fetched value, or use 50 km as a
+  // conservative default so fare estimates are still shown in the booking flow.
+  if (!S.distKm) S.distKm = 50;
   showDistBadge(`~${S.distKm} km`, 'estimated');
 }
 
@@ -1777,22 +1670,19 @@ function estimateHeroDist(){
           document.getElementById('h-distTxt').textContent = `${d.distanceText} · ~${d.durationText}`;
           calcHeroFare();
         } else {
-          heroDistFallback(dr);
+          heroDistFallback();
         }
       })
-      .catch(()=>heroDistFallback(dr));
+      .catch(()=>heroDistFallback());
   } else {
-    heroDistFallback(dr);
+    heroDistFallback();
   }
 }
 
-function heroDistFallback(dr){
-  const low = (dr||'').toLowerCase();
-  let km = 0;
-  for(const [k,v] of Object.entries(CITY_DIST)){if(low.includes(k)){km=v;break;}}
-  km = km||50;
+function heroDistFallback(){
+  const km = S.distKm || 50;
   document.getElementById('h-distBadge').classList.add('show');
-  document.getElementById('h-distTxt').textContent = `~${km} km estimated`;
+  document.getElementById('h-distTxt').textContent = `~${km} km (estimated)`;
   S.distKm = km;
   calcHeroFare();
 }
