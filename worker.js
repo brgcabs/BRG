@@ -1,27 +1,32 @@
 /**
  * ════════════════════════════════════════════════════════════════
  *  BRG CABS — Cloudflare Worker
- *  File: cloudflare-worker.js
- *  Deploy: https://dash.cloudflare.com → Workers → Create Worker
+ *  URL: https://brgcabs.brgtoursindia.workers.dev
  * ════════════════════════════════════════════════════════════════
  *
- *  ENVIRONMENT VARIABLES (set in Cloudflare Dashboard → Worker → Settings → Variables)
+ *  ENVIRONMENT VARIABLES (Settings → Variables and Secrets)
  *  ─────────────────────────────────────────────────────────────
- *  GOOGLE_MAPS_KEY       → Your Google Maps API Key
- *  GOOGLE_SCRIPT_URL     → Deployed Google Apps Script Web App URL
- *  RAZORPAY_KEY_ID       → Razorpay Key ID (rzp_live_XXXX)
- *  RAZORPAY_KEY_SECRET   → Razorpay Key Secret (mark as Secret)
- *  ALLOWED_ORIGIN        → https://www.brgcabs.in  (your domain)
- * ═══════════════════════════════════════════════════════════════
+ *  GOOGLE_MAPS_KEY        → Google Maps API Key
+ *  GOOGLE_SCRIPT_URL      → Google Apps Script URL (for booking sheet logging)
+ *  RAZORPAY_KEY_ID        → Razorpay Key ID
+ *  RAZORPAY_KEY_SECRET    → Razorpay Key Secret
+ *  ALLOWED_ORIGIN         → https://www.brgcabs.in
+ *  ADMIN_EMAIL            → Admin email for notifications
+ *  ADMIN_PHONE            → Admin WhatsApp number (91XXXXXXXXXX)
+ *  WA_ACCESS_TOKEN        → WhatsApp Business API Bearer Token
+ *  WA_PHONE_NUMBER_ID     → WhatsApp Business Phone Number ID
+ *  WA_OTP_TEMPLATE_NAME   → WhatsApp OTP template name (e.g. "brg_otp")
+ *  WA_TEMPLATE_LANG       → Template language code (e.g. "en" or "en_US")
+ * ════════════════════════════════════════════════════════════════
  *
  *  API ENDPOINTS:
  *  ─────────────────────────────────────────────────────────────
- *  POST /api/otp/send          → Send OTP via Google Apps Script
+ *  POST /api/otp/send          → Send OTP via WhatsApp Business API
  *  GET  /api/distance          → Google Distance Matrix
- *  GET  /api/places            → Google Places Autocomplete
+ *  GET  /api/places            → Google Places Autocomplete (all India)
  *  POST /api/payment/order     → Create Razorpay Order
  *  POST /api/payment/verify    → Verify Razorpay Payment Signature
- *  POST /api/booking/notify    → Send admin WhatsApp notification
+ *  POST /api/booking/notify    → Save booking + notify admin on WhatsApp
  * ════════════════════════════════════════════════════════════════
  */
 
@@ -30,7 +35,6 @@ export default {
     const url = new URL(request.url);
 
     // ── CORS HEADERS ──
-    const origin = request.headers.get('Origin') || '';
     const allowedOrigin = env.ALLOWED_ORIGIN || '*';
     const corsHeaders = {
       'Access-Control-Allow-Origin': allowedOrigin,
@@ -39,7 +43,6 @@ export default {
       'Access-Control-Max-Age': '86400',
     };
 
-    // Handle preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -50,11 +53,45 @@ export default {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
 
+    // ── WhatsApp API helper ──
+    const sendWhatsApp = async (toPhone, templateName, langCode, components) => {
+      const phoneId = env.WA_PHONE_NUMBER_ID;
+      const token   = env.WA_ACCESS_TOKEN;
+      if (!phoneId || !token) throw new Error('WhatsApp not configured');
+
+      // Ensure phone is in international format without + (e.g. 919876543210)
+      const phone = toPhone.replace(/\D/g, '').replace(/^0/, '91');
+
+      const body = {
+        messaging_product: 'whatsapp',
+        to: phone,
+        type: 'template',
+        template: {
+          name: templateName,
+          language: { code: langCode || 'en' },
+          components: components || [],
+        },
+      };
+
+      const res = await fetch(
+        `https://graph.facebook.com/v19.0/${phoneId}/messages`,
+        {
+          method:  'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':  'application/json',
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      return res.json();
+    };
+
     try {
       const path = url.pathname;
 
       // ──────────────────────────────────────────────────────────
-      // 1. SEND OTP
+      // 1. SEND OTP via WhatsApp Business API
       // POST /api/otp/send
       // Body: { phone: "9876543210", otp: "4521", name: "Rajesh" }
       // ──────────────────────────────────────────────────────────
@@ -65,19 +102,35 @@ export default {
           return json({ success: false, error: 'phone and otp are required' }, 400);
         }
 
-        // Call your deployed Google Apps Script URL
-        const scriptResponse = await fetch(env.GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, otp, name }),
-        });
+        const templateName = env.WA_OTP_TEMPLATE_NAME || 'brgcabs_otp';
+        const langCode     = env.WA_TEMPLATE_LANG     || 'en';
 
-        if (!scriptResponse.ok) {
-          return json({ success: false, error: 'OTP service unavailable' }, 502);
+        // Meta Authentication template: "*{{1}}* is your verification code."
+        // Authentication templates ONLY take one component: button with otp_type=COPY_CODE
+        // The body {{1}} is automatically filled by the button parameter
+        const components = [
+          {
+            type:     'button',
+            sub_type: 'url',
+            index:    '0',
+            parameters: [{ type: 'text', text: otp }],
+          },
+        ];
+
+        try {
+          const waResult = await sendWhatsApp(phone, templateName, langCode, components);
+
+          if (waResult.error) {
+            console.error('WA OTP error:', JSON.stringify(waResult.error));
+            return json({ success: false, error: waResult.error.message || 'WhatsApp send failed' }, 502);
+          }
+
+          return json({ success: true, message: 'OTP sent via WhatsApp', messageId: waResult.messages?.[0]?.id });
+
+        } catch (waErr) {
+          console.error('WA OTP exception:', waErr.message);
+          return json({ success: false, error: 'OTP service error' }, 502);
         }
-
-        const result = await scriptResponse.json();
-        return json({ success: true, message: 'OTP sent', ...result });
       }
 
       // ──────────────────────────────────────────────────────────
@@ -123,8 +176,8 @@ export default {
       }
 
       // ──────────────────────────────────────────────────────────
-      // 3. PLACES AUTOCOMPLETE
-      // GET /api/places?input=Delhi air
+      // 3. PLACES AUTOCOMPLETE — All India
+      // GET /api/places?input=Mumbai airport
       // ──────────────────────────────────────────────────────────
       if (path === '/api/places' && request.method === 'GET') {
         const input        = url.searchParams.get('input');
@@ -145,7 +198,7 @@ export default {
         const placesData = await placesRes.json();
 
         return json({
-          success:     placesData.status === 'OK',
+          success:     placesData.status === 'OK' || placesData.status === 'ZERO_RESULTS',
           predictions: (placesData.predictions || []).slice(0, 8).map(p => ({
             place_id:    p.place_id,
             description: p.description,
@@ -164,7 +217,7 @@ export default {
         const { amount, bookingId, notes } = await request.json();
 
         if (!amount || amount < 100) {
-          return json({ success: false, error: 'Invalid amount' }, 400);
+          return json({ success: false, error: 'Invalid amount (minimum ₹100)' }, 400);
         }
 
         const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
@@ -173,10 +226,10 @@ export default {
           method:  'POST',
           headers: {
             'Authorization': `Basic ${credentials}`,
-            'Content-Type': 'application/json',
+            'Content-Type':  'application/json',
           },
           body: JSON.stringify({
-            amount:   amount * 100, // paise
+            amount:   Math.round(amount * 100), // paise
             currency: 'INR',
             receipt:  bookingId || `BRG${Date.now()}`,
             notes:    notes || {},
@@ -194,7 +247,7 @@ export default {
           orderId:  rzpData.id,
           amount:   rzpData.amount,
           currency: rzpData.currency,
-          key_id:   env.RAZORPAY_KEY_ID, // safe to expose key_id
+          key_id:   env.RAZORPAY_KEY_ID,
         });
       }
 
@@ -206,7 +259,10 @@ export default {
       if (path === '/api/payment/verify' && request.method === 'POST') {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await request.json();
 
-        // Verify HMAC SHA256 signature
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+          return json({ success: false, error: 'Missing payment fields' }, 400);
+        }
+
         const body    = `${razorpay_order_id}|${razorpay_payment_id}`;
         const encoder = new TextEncoder();
         const keyData = encoder.encode(env.RAZORPAY_KEY_SECRET);
@@ -228,9 +284,10 @@ export default {
       }
 
       // ──────────────────────────────────────────────────────────
-      // 6. BOOKING NOTIFICATION (store to KV + notify via script)
+      // 6. BOOKING NOTIFICATION
       // POST /api/booking/notify
-      // Body: { booking: { id, name, phone, ... } }
+      // Body: { booking: { id, name, phone, from, to, date, vehicle, fare, tripType } }
+      // ── Saves to KV + logs to Google Sheet + notifies admin on WhatsApp
       // ──────────────────────────────────────────────────────────
       if (path === '/api/booking/notify' && request.method === 'POST') {
         const { booking } = await request.json();
@@ -239,22 +296,69 @@ export default {
           return json({ success: false, error: 'Invalid booking data' }, 400);
         }
 
-        // Optional: Store in KV (if KV namespace bound as BOOKINGS)
+        const results = { stored: false, sheet: false, adminNotified: false };
+
+        // ── Save to KV (BOOKINGS namespace) ──
         if (env.BOOKINGS) {
-          await env.BOOKINGS.put(booking.id, JSON.stringify({
-            ...booking,
-            timestamp: new Date().toISOString(),
-          }), { expirationTtl: 60 * 60 * 24 * 90 }); // 90 days
+          try {
+            await env.BOOKINGS.put(booking.id, JSON.stringify({
+              ...booking,
+              timestamp: new Date().toISOString(),
+            }), { expirationTtl: 60 * 60 * 24 * 90 }); // 90 days
+            results.stored = true;
+          } catch (e) { console.error('KV store error:', e.message); }
         }
 
-        // Notify admin via Google Script (sends WhatsApp/Email)
-        const notifyRes = await fetch(env.GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'booking_notify', booking }),
-        });
+        // ── Log to Google Sheet via Apps Script ──
+        if (env.GOOGLE_SCRIPT_URL) {
+          try {
+            await fetch(env.GOOGLE_SCRIPT_URL, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    JSON.stringify({ type: 'booking_notify', booking }),
+            });
+            results.sheet = true;
+          } catch (e) { console.error('Sheet log error:', e.message); }
+        }
 
-        return json({ success: true, stored: !!env.BOOKINGS });
+        // ── Notify Admin on WhatsApp ──
+        if (env.ADMIN_PHONE && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
+          try {
+            const adminMsg = [
+              `🚖 *New BRG CABS Booking!*`,
+              `ID: ${booking.id}`,
+              `👤 ${booking.name} | 📞 ${booking.phone}`,
+              `📍 ${booking.from} → ${booking.to}`,
+              `📅 ${booking.date}${booking.time ? ' ' + booking.time : ''}`,
+              `🚗 ${booking.vehicle} | ${booking.tripType || 'One Way'}`,
+              `💰 Fare: ₹${booking.fare} | Advance: ₹${booking.advance || 0}`,
+              booking.notes ? `📝 ${booking.notes}` : '',
+            ].filter(Boolean).join('\n');
+
+            // Use a text message for admin (no template needed for business-initiated text to own number)
+            // If admin number is verified in WABA, use template; otherwise use text
+            const adminPhoneClean = env.ADMIN_PHONE.replace(/\D/g, '').replace(/^0/, '91');
+            await fetch(
+              `https://graph.facebook.com/v19.0/${env.WA_PHONE_NUMBER_ID}/messages`,
+              {
+                method:  'POST',
+                headers: {
+                  'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`,
+                  'Content-Type':  'application/json',
+                },
+                body: JSON.stringify({
+                  messaging_product: 'whatsapp',
+                  to:   adminPhoneClean,
+                  type: 'text',
+                  text: { body: adminMsg, preview_url: false },
+                }),
+              }
+            );
+            results.adminNotified = true;
+          } catch (e) { console.error('Admin WA notify error:', e.message); }
+        }
+
+        return json({ success: true, ...results });
       }
 
       // 404
@@ -269,29 +373,30 @@ export default {
 
 /**
  * ════════════════════════════════════════════════════════════════
- *  DEPLOYMENT STEPS
+ *  ALL ENVIRONMENT VARIABLES — already set in your dashboard ✅
  * ════════════════════════════════════════════════════════════════
  *
- *  1. Go to dash.cloudflare.com → Workers & Pages → Create Worker
- *  2. Paste this file content
- *  3. Click "Save and Deploy"
- *  4. Go to Settings → Variables and Secrets, add:
+ *  ADMIN_EMAIL            ✅
+ *  ADMIN_PHONE            ✅  (format: 919876543210)
+ *  ALLOWED_ORIGIN         ✅  https://www.brgcabs.in
+ *  GOOGLE_MAPS_KEY        ✅
+ *  GOOGLE_SCRIPT_URL      ✅
+ *  RAZORPAY_KEY_ID        ✅
+ *  RAZORPAY_KEY_SECRET    ✅
+ *  WA_ACCESS_TOKEN        ✅
+ *  WA_OTP_TEMPLATE_NAME   ✅  (your approved OTP template name)
+ *  WA_PHONE_NUMBER_ID     ✅
+ *  WA_TEMPLATE_LANG       ✅  (e.g. "en" or "en_US")
  *
- *     Variable Name          │ Type    │ Value
- *     ──────────────────────────────────────────
- *     GOOGLE_MAPS_KEY        │ Secret  │ AIza...
- *     GOOGLE_SCRIPT_URL      │ Secret  │ https://script.google.com/macros/s/.../exec
- *     RAZORPAY_KEY_ID        │ Text    │ rzp_live_...
- *     RAZORPAY_KEY_SECRET    │ Secret  │ your_secret
- *     ALLOWED_ORIGIN         │ Text    │ https://www.brgcabs.in
+ *  OPTIONAL — Add KV namespace binding named "BOOKINGS" for booking storage
  *
- *  5. Optionally add a KV namespace named "BOOKINGS" for booking storage
- *
- *  6. Add custom route in Cloudflare DNS:
- *     Route: www.brgcabs.in/api/*  → Your Worker
- *
- *  7. In brgcabs.html, set:
- *     window.WORKER_URL = 'https://your-worker.workers.dev';
- *
+ * ════════════════════════════════════════════════════════════════
+ *  OTP TEMPLATE — brgcabs_otp (Authentication, Active ✅)
+ * ════════════════════════════════════════════════════════════════
+ *  Template body: "*{{1}}* is your verification code."
+ *  Category: Authentication — Meta auto-fills {{1}} via the button parameter.
+ *  No body component needed — only the button component with the OTP value.
+ *  WA_OTP_TEMPLATE_NAME = "brgcabs_otp"
+ *  WA_TEMPLATE_LANG     = "en"
  * ════════════════════════════════════════════════════════════════
  */
