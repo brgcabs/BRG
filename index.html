@@ -1556,9 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { initScroll(); } catch(e) {}
   try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); } catch(e) {}
 
-  document.addEventListener('click', e => {
-    try { hidePortal(); } catch(e) {}
-  });
+  // Dropdown closed by its own outside-click handler (mousedown on body)
   try {
     const modal = document.getElementById('bookModal');
     if(modal) modal.addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
@@ -1587,168 +1585,141 @@ function setHTrip(t, btn){
 function updateMBtnLabel(){document.getElementById('mBtnNext').textContent = S.step===1 ? 'Search Cabs →' : S.step===2 ? 'Continue →' : S.step===3 ? 'Send OTP →' : 'Verify →';}
 
 // ══ AUTOCOMPLETE ══
-// ══ PLACES AUTOCOMPLETE (Google API via Worker + local fallback) ══
 const acTimers = {};
 
+// ── Fetch from Worker (Google Places API — all India: cities, towns, villages, landmarks)
 function fetchPlaces(q, callback) {
-  // Always call Google Places via Worker — covers every city, town, village & landmark in India
   const token = Math.random().toString(36).substr(2,9);
   fetch(`${WORKER}/api/places?input=${encodeURIComponent(q)}&sessiontoken=${token}`)
-    .then(r => { if(!r.ok) throw new Error('network'); return r.json(); })
+    .then(r => r.json())
     .then(data => {
-      if(data.predictions && data.predictions.length) {
-        callback(data.predictions.map(p => ({
-          n: p.description,
-          s: p.secondary || p.main_text || '',
-          type: 'google'
-        })));
-      } else {
-        callback([]); // no results — show nothing, let user keep typing
-      }
+      callback((data.predictions || []).map(p => ({
+        n: p.description,
+        s: p.secondary || p.main_text || ''
+      })));
     })
-    .catch(() => callback([])); // on error show nothing rather than stale local list
+    .catch(() => callback([]));
 }
 
-function localSearch(q) {
-  const ql = q.toLowerCase();
-  // Score: exact name start = 3, word start in name = 2, substring in name = 1, substring in state = 0
-  const scored = LOCATIONS.map(l => {
-    const nl = l.n.toLowerCase();
-    const sl = (l.s||'').toLowerCase();
-    let score = 0;
-    if(nl.startsWith(ql)) score = 3;
-    else if(nl.split(/[\s,]+/).some(w => w.startsWith(ql))) score = 2;
-    else if(nl.includes(ql)) score = 1;
-    else if(sl.includes(ql)) score = 0;
-    else return null;
-    return {l, score};
-  }).filter(Boolean);
-  scored.sort((a,b) => b.score - a.score);
-  return scored.slice(0, 9).map(x => x.l);
-}
+// ── Portal: single <div> appended to <body>, escapes all stacking contexts
+let _portal = null;
+let _portalCb = null;
+let _activeInp = null;
 
-// ══ PORTAL AUTOCOMPLETE ══
-// Renders dropdown in <body> to escape stacking contexts (backdrop-filter, overflow:auto, etc.)
-let acPortal = null;
-let acPortalOnSelect = null;
-
-function getOrCreatePortal() {
-  if(!acPortal) {
-    acPortal = document.createElement('div');
-    acPortal.id = 'ac-portal';
-    acPortal.style.cssText = [
-      'position:fixed',
-      'z-index:99999',
-      'background:#fff',
-      'border:1.5px solid rgba(0,0,0,.1)',
-      'border-radius:12px',
-      'box-shadow:0 12px 40px rgba(0,0,0,.18)',
-      'max-height:260px',
-      'overflow-y:auto',
-      'display:none',
-      'font-family:DM Sans,sans-serif',
-      'min-width:260px',
-    ].join(';');
-    document.body.appendChild(acPortal);
-
-    // Close on outside click
-    document.addEventListener('mousedown', e => {
-      if(acPortal && !acPortal.contains(e.target)) hidePortal();
-    });
-    // Close on scroll
-    window.addEventListener('scroll', hidePortal, true);
+function _getPortal() {
+  if (!_portal) {
+    _portal = document.createElement('div');
+    _portal.style.cssText = 'position:fixed;z-index:2147483647;background:#1c1c1c;border:1px solid rgba(245,197,24,.3);border-radius:10px;box-shadow:0 16px 48px rgba(0,0,0,.5);max-height:280px;overflow-y:auto;display:none;font-family:DM Sans,sans-serif;width:320px';
+    document.body.appendChild(_portal);
   }
-  return acPortal;
+  return _portal;
 }
 
-function showPortalAt(inp, html, onSelect) {
-  const portal = getOrCreatePortal();
-  acPortalOnSelect = onSelect;
-  const rect = inp.getBoundingClientRect();
-  portal.style.left   = rect.left + 'px';
-  portal.style.top    = (rect.bottom + 4) + 'px';
-  portal.style.width  = rect.width + 'px';
-  portal.style.display = 'block';
-  portal.innerHTML = html;
-  portal.querySelectorAll('.ac-item').forEach((el, i) => {
-    el.addEventListener('mousedown', e => {
+function _positionPortal(inp) {
+  const p = _getPortal();
+  const r = inp.getBoundingClientRect();
+  p.style.top   = (r.bottom + window.scrollY + 4) + 'px';
+  p.style.left  = (r.left + window.scrollX) + 'px';
+  p.style.width = r.width + 'px';
+  // Reposition to fixed (not scrollY-relative) since position:fixed already accounts for scroll
+  p.style.top  = (r.bottom + 4) + 'px';
+  p.style.left = r.left + 'px';
+}
+
+function _showLoading(inp) {
+  const p = _getPortal();
+  _positionPortal(inp);
+  p.innerHTML = '<div style="padding:12px 16px;color:#aaa;font-size:.83rem;display:flex;align-items:center;gap:10px"><span style="width:13px;height:13px;border:2px solid #444;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>Searching across India…</div>';
+  p.style.display = 'block';
+}
+
+function _showResults(inp, items, onPick) {
+  const p = _getPortal();
+  _positionPortal(inp);
+  if (!items.length) { p.style.display = 'none'; return; }
+  p.innerHTML = items.map((m, i) => {
+    const name = m.n || '';
+    const sub  = m.s || '';
+    const icon = /airport/i.test(name) ? '✈️' : /station|junction/i.test(name) ? '🚉' : '📍';
+    return `<div class="_ac-row" data-i="${i}" style="padding:10px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="font-size:1rem;margin-top:1px">${icon}</span>
+      <div><div style="font-weight:600;font-size:.85rem;color:#fff;line-height:1.3">${name}</div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px">${sub}</div></div>
+    </div>`;
+  }).join('');
+  // Hover effect
+  p.querySelectorAll('._ac-row').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.background = 'rgba(245,197,24,.1)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+    // mousedown fires before blur — this is how we prevent blur closing dropdown first
+    row.addEventListener('mousedown', e => {
       e.preventDefault();
-      const name = el.dataset.name;
-      if(name && acPortalOnSelect) acPortalOnSelect(name);
-      hidePortal();
+      const item = items[+row.dataset.i];
+      if (item) onPick(item.n || '');
+      _closePortal();
     });
   });
+  p.style.display = 'block';
 }
 
-function hidePortal() {
-  if(acPortal) acPortal.style.display = 'none';
+function _closePortal() {
+  if (_portal) _portal.style.display = 'none';
+  _portalCb = null;
 }
 
-function buildPortalHTML(items, isDark) {
-  if(!items.length) return '<div style="padding:12px 14px;font-size:.82rem;color:#999">No results found</div>';
-  const bg    = isDark ? '#1a1a1a' : '#fff';
-  const color = isDark ? '#fff'    : '#111';
-  const sub   = isDark ? 'rgba(255,255,255,.44)' : '#777';
-  const hover = isDark ? 'rgba(255,255,255,.06)' : '#f6f6f6';
-  return items.map(m => {
-    const name = m.n || m.description || '';
-    const s    = m.s || m.secondary  || '';
-    const icon = name.toLowerCase().includes('airport') ? '✈️' : name.toLowerCase().includes('station') ? '🚉' : '📍';
-    const safe = name.replace(/"/g, '&quot;');
-    return `<div class="ac-item" data-name="${safe}" style="padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.05);background:${bg};color:${color}" onmouseover="this.style.background='${hover}'" onmouseout="this.style.background='${bg}'"><span>${icon}</span><div><div style="font-weight:600;font-size:.86rem">${name}</div><div style="font-size:.73rem;color:${sub}">${s}</div></div></div>`;
-  }).join('');
-}
+// Close when clicking outside both input and portal
+document.addEventListener('mousedown', e => {
+  if (_portal && _portal.style.display !== 'none') {
+    if (!_portal.contains(e.target) && e.target !== _activeInp) {
+      _closePortal();
+    }
+  }
+});
 
-function buildLoadingHTML(isDark) {
-  const color = isDark ? '#aaa' : '#888';
-  const bg    = isDark ? '#1a1a1a' : '#fff';
-  return `<div style="padding:12px 14px;font-size:.82rem;color:${color};display:flex;align-items:center;gap:8px;background:${bg}"><span style="width:14px;height:14px;border:2px solid #ddd;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;flex-shrink:0"></span>Searching all India…</div>`;
-}
-
-function attachAC(inp, isDark, onSelect) {
-  if(!inp) return;
+// ── Attach AC to any input
+function _attachAC(inp, onPick) {
+  if (!inp) return;
+  _activeInp = inp;
   inp.addEventListener('input', () => {
     const q = inp.value.trim();
-    if(q.length < 2){ hidePortal(); return; }
+    if (q.length < 2) { _closePortal(); return; }
     clearTimeout(acTimers[inp.id]);
-    showPortalAt(inp, buildLoadingHTML(isDark), null);
+    _showLoading(inp);
     acTimers[inp.id] = setTimeout(() => {
-      fetchPlaces(q, items => {
-        if(!items.length){ hidePortal(); return; }
-        showPortalAt(inp, buildPortalHTML(items, isDark), onSelect);
-      });
-    }, 300);
-  });
-  inp.addEventListener('blur', () => setTimeout(hidePortal, 150));
-}
-
-function setupAC(inputId, dropId, stateKey){
-  const inp = document.getElementById(inputId);
-  attachAC(inp, false, name => {
-    inp.value = name;
-    if(stateKey==='pu') S.pu=name; else S.dr=name;
-    estimateDist();
-    if(mStep===2) buildCabResults();
-  });
-}
-
-function hAC(inputId, dropId){
-  // Called via oninput on hero inputs — delegate to portal system
-  const inp = document.getElementById(inputId);
-  if(!inp) return;
-  const q = inp.value.trim();
-  if(q.length < 2){ hidePortal(); return; }
-  clearTimeout(acTimers['h_'+inputId]);
-  showPortalAt(inp, buildLoadingHTML(true), null);
-  acTimers['h_'+inputId] = setTimeout(() => {
-    fetchPlaces(q, items => {
-      if(!items.length){ hidePortal(); return; }
-      showPortalAt(inp, buildPortalHTML(items, true), name => {
+      fetchPlaces(q, items => _showResults(inp, items, name => {
         inp.value = name;
-        estimateHeroDist();
-      });
-    });
-  }, 300);
+        onPick(name);
+      }));
+    }, 350);
+  });
+  inp.addEventListener('focus', () => { _activeInp = inp; });
+}
+
+// ── Modal inputs (called from DOMContentLoaded)
+function setupAC(inputId, dropId, stateKey) {
+  const inp = document.getElementById(inputId);
+  _attachAC(inp, name => {
+    if (stateKey === 'pu') S.pu = name; else S.dr = name;
+    estimateDist();
+    if (mStep === 2) buildCabResults();
+  });
+}
+
+// ── Hero inputs (called from oninput="hAC(...)" inline attribute)
+function hAC(inputId, dropId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  _activeInp = inp;
+  const q = inp.value.trim();
+  if (q.length < 2) { _closePortal(); return; }
+  clearTimeout(acTimers['h_' + inputId]);
+  _showLoading(inp);
+  acTimers['h_' + inputId] = setTimeout(() => {
+    fetchPlaces(q, items => _showResults(inp, items, name => {
+      inp.value = name;
+      estimateHeroDist();
+    }));
+  }, 350);
 }
 
 function selectAC(inputId, dropId, key, name){
