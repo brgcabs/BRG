@@ -390,31 +390,6 @@ export default {
         return json({ success: true, ...results });
       }
 
-      // ── DEBUG: GET /api/debug/places?input=delhi
-      // Remove or protect this endpoint before going to production
-      if (path === '/api/debug/places' && request.method === 'GET') {
-        const input = url.searchParams.get('input') || 'delhi';
-        const placesRes = await fetch(
-          'https://places.googleapis.com/v1/places:autocomplete',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type':     'application/json',
-              'X-Goog-Api-Key':   env.GOOGLE_MAPS_KEY,
-              'X-Goog-FieldMask':
-                'suggestions.placePrediction.placeId,' +
-                'suggestions.placePrediction.text,' +
-                'suggestions.placePrediction.structuredFormat',
-            },
-            body: JSON.stringify({ input, includedRegionCodes: ['IN'], languageCode: 'en' }),
-          }
-        );
-        const raw = await placesRes.json();
-        return new Response(JSON.stringify({ httpStatus: placesRes.status, raw }, null, 2), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
       // 404
       return json({ success: false, error: 'Endpoint not found' }, 404);
 
