@@ -1450,20 +1450,21 @@ const _reqIds = {};
 //    Per-input request IDs prevent stale responses from a slower earlier fetch
 //    overwriting the results of a faster later one.
 function fetchPlaces(q, inpId, callback) {
+  const myId = (_reqIds[inpId] = (_reqIds[inpId] || 0) + 1);
+
   if (!WORKER || WORKER.includes('YOUR-SUBDOMAIN')) {
     return callback([]);
   }
 
-  const myId = (_reqIds[inpId] = (_reqIds[inpId] || 0) + 1);
-
   fetch(`${WORKER}/api/places?input=${encodeURIComponent(q)}`)
     .then(r => r.json())
     .then(data => {
-      if (_reqIds[inpId] !== myId) return; // newer request already in flight — discard
-      callback((data.predictions || []).map(p => ({
+      if (_reqIds[inpId] !== myId) return;
+      const results = (data.predictions || []).map(p => ({
         n: p.description,
         s: p.secondary || p.main_text || ''
-      })));
+      }));
+      callback(results);
     })
     .catch(() => {
       if (_reqIds[inpId] === myId) callback([]);
@@ -1481,6 +1482,10 @@ function _getPortal() {
     _portal = document.createElement('div');
     _portal.style.cssText = 'position:fixed;z-index:2147483647;background:#1c1c1c;border:1px solid rgba(245,197,24,.3);border-radius:10px;box-shadow:0 16px 48px rgba(0,0,0,.5);max-height:280px;overflow-y:auto;display:none;font-family:DM Sans,sans-serif;width:320px';
     document.body.appendChild(_portal);
+    // Track touch on the portal so blur on the input doesn't prematurely close it
+    _portal.addEventListener('touchstart', () => { _portal._touching = true; }, { passive: true });
+    _portal.addEventListener('touchend',   () => { setTimeout(() => { _portal._touching = false; }, 50); });
+    _portal.addEventListener('touchcancel',() => { _portal._touching = false; });
   }
   return _portal;
 }
@@ -1517,17 +1522,39 @@ function _showResults(inp, items, onPick) {
       <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px">${sub}</div></div>
     </div>`;
   }).join('');
-  // Hover effect
+
+  // Helper: pick an item by index and close portal
+  function pickItem(idx) {
+    const item = items[+idx];
+    if (item) onPick(item.n || '');
+    _closePortal();
+  }
+
   p.querySelectorAll('._ac-row').forEach(row => {
     row.addEventListener('mouseenter', () => row.style.background = 'rgba(245,197,24,.1)');
     row.addEventListener('mouseleave', () => row.style.background = '');
-    // mousedown fires before blur — this is how we prevent blur closing dropdown first
+    // mousedown fires before blur on desktop — prevents blur closing portal before selection
     row.addEventListener('mousedown', e => {
       e.preventDefault();
-      const item = items[+row.dataset.i];
-      if (item) onPick(item.n || '');
-      _closePortal();
+      pickItem(row.dataset.i);
     });
+    // touchstart+touchend for mobile — touchstart marks intent, touchend confirms pick
+    // We use touchend so accidental scrolls (touchcancel) don't trigger selection
+    let _touchStartY = 0;
+    row.addEventListener('touchstart', e => {
+      _touchStartY = e.touches[0].clientY;
+      row.style.background = 'rgba(245,197,24,.15)';
+    }, { passive: true });
+    row.addEventListener('touchend', e => {
+      const moved = Math.abs(e.changedTouches[0].clientY - _touchStartY);
+      if (moved < 10) { // not a scroll
+        e.preventDefault(); // prevent the synthetic mouse click / blur
+        pickItem(row.dataset.i);
+      } else {
+        row.style.background = '';
+      }
+    });
+    row.addEventListener('touchcancel', () => { row.style.background = ''; });
   });
   p.style.display = 'block';
 }
@@ -1538,20 +1565,21 @@ function _closePortal() {
   _currentInp = null; // no portal is showing for any input
 }
 
-// Close when clicking outside both input and portal
-document.addEventListener('mousedown', e => {
+// Close when clicking/tapping outside both input and portal
+function _outsideClose(e) {
   if (_portal && _portal.style.display !== 'none') {
     if (!_portal.contains(e.target) && e.target !== _activeInp) {
       _closePortal();
     }
   }
-});
+}
+document.addEventListener('mousedown', _outsideClose);
+document.addEventListener('touchstart', _outsideClose, { passive: true });
 
 // ── Attach AC to any input
 function _attachAC(inp, onPick) {
   if (!inp) return;
-  // NOTE: _activeInp is NOT set here at registration time (that caused Bug 3).
-  //       It is only set on actual user focus events below.
+
   inp.addEventListener('input', () => {
     const q = inp.value.trim();
     if (q.length < 2) { _currentInp = null; _closePortal(); return; }
@@ -1565,10 +1593,14 @@ function _attachAC(inp, onPick) {
     }, 350);
   });
   inp.addEventListener('focus', () => { _activeInp = inp; });
-  // Close portal when input loses focus (200 ms delay lets a mousedown on a
-  // portal row fire first, so selection still works before the portal closes)
+  // Close portal when input loses focus.
+  // 300 ms delay lets mousedown/touchend on a portal row fire first.
+  // If a touch on the portal is in progress (_portal._touching), skip — touchend will close it.
   inp.addEventListener('blur', () => {
-    setTimeout(() => { if (_activeInp === inp) _closePortal(); }, 200);
+    setTimeout(() => {
+      if (_portal && _portal._touching) return;
+      if (_activeInp === inp) _closePortal();
+    }, 300);
   });
 }
 
