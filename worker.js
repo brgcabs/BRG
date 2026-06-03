@@ -56,8 +56,8 @@ export default {
 
     // ── WhatsApp API helper ──
     const sendWhatsApp = async (toPhone, templateName, langCode, components) => {
-      const phoneId = env.WA_PHONE_NUMBER_ID;
-      const token   = env.WA_ACCESS_TOKEN;
+      const phoneId = env.WHATSAPP_PHONE_ID;
+      const token   = env.WHATSAPP_TOKEN;
       if (!phoneId || !token) throw new Error('WhatsApp not configured');
 
       // Ensure phone is in international format without + (e.g. 919876543210)
@@ -351,7 +351,7 @@ export default {
         }
 
         // ── Notify Admin on WhatsApp ──
-        if (env.ADMIN_PHONE && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
+        if (env.ADMIN_PHONE && env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_ID) {
           try {
             const adminMsg = [
               `🚖 *New BRG CABS Booking!*`,
@@ -368,11 +368,11 @@ export default {
             // If admin number is verified in WABA, use template; otherwise use text
             const adminPhoneClean = env.ADMIN_PHONE.replace(/\D/g, '').replace(/^0/, '91');
             await fetch(
-              `https://graph.facebook.com/v19.0/${env.WA_PHONE_NUMBER_ID}/messages`,
+              `https://graph.facebook.com/v19.0/${env.WHATSAPP_PHONE_ID}/messages`,
               {
                 method:  'POST',
                 headers: {
-                  'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`,
+                  'Authorization': `Bearer ${env.WHATSAPP_TOKEN}`,
                   'Content-Type':  'application/json',
                 },
                 body: JSON.stringify({
@@ -412,9 +412,9 @@ export default {
  *  GOOGLE_SCRIPT_URL      ✅
  *  RAZORPAY_KEY_ID        ✅
  *  RAZORPAY_KEY_SECRET    ✅
- *  WA_ACCESS_TOKEN        ✅
+ *  WHATSAPP_TOKEN         ✅
  *  WA_OTP_TEMPLATE_NAME   ✅  (your approved OTP template name)
- *  WA_PHONE_NUMBER_ID     ✅
+ *  WHATSAPP_PHONE_ID      ✅
  *  WA_TEMPLATE_LANG       ✅  (e.g. "en" or "en_US")
  *
  *  OPTIONAL — Add KV namespace binding named "BOOKINGS" for booking storage

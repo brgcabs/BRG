@@ -3,11 +3,14 @@
   "main": "worker.js",
   "compatibility_date": "2025-05-30",
 
+  // ── Plain text vars (non-sensitive) ──────────────────────────
   "vars": {
-    "RAZORPAY_KEY_ID": "rzp_live_XXXXXXXXXXXX",
-    "ALLOWED_ORIGIN": "https://www.brgcabs.in"
+    "RAZORPAY_KEY_ID":  "rzp_live_XXXXXXXXXXXX",
+    "ALLOWED_ORIGIN":   "https://www.brgcabs.in",
+    "WA_TEMPLATE_LANG": "en"
   },
 
+  // ── KV Namespace binding ─────────────────────────────────────
   "kv_namespaces": [
     {
       "binding": "BOOKINGS",
@@ -15,7 +18,20 @@
     }
   ],
 
+  // ── Observability ────────────────────────────────────────────
   "observability": {
     "enabled": true
   }
+
+  // ── Secrets (set via Cloudflare Dashboard → Settings → Variables and Secrets)
+  // Do NOT add secrets here — they are encrypted in the dashboard:
+  //
+  //   ADMIN_EMAIL           → brgcabs@gmail.com
+  //   ADMIN_PHONE           → 919811419926
+  //   GOOGLE_MAPS_KEY       → your Google Maps API key
+  //   GOOGLE_SCRIPT_URL     → your Google Apps Script URL
+  //   RAZORPAY_KEY_SECRET   → your Razorpay secret key
+  //   WHATSAPP_TOKEN        → your Meta WhatsApp Bearer token
+  //   WHATSAPP_PHONE_ID     → your Meta WhatsApp Phone Number ID
+  //   WA_OTP_TEMPLATE_NAME  → brgcabs_otp  (your approved OTP template name)
 }
