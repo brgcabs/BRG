@@ -103,34 +103,49 @@ export default {
           return json({ success: false, error: 'phone and otp are required' }, 400);
         }
 
-        const templateName = env.WA_OTP_TEMPLATE_NAME || 'brgcabs_otp';
-        const langCode     = env.WA_TEMPLATE_LANG     || 'en';
+        const templateName = env.WA_OTP_TEMPLATE_NAME || 'hello_world';
+        const langCode     = env.WA_TEMPLATE_LANG     || 'en_US';
 
-        // Meta Authentication template: "*{{1}}* is your verification code."
-        // Authentication templates ONLY take one component: button with otp_type=COPY_CODE
-        // The body {{1}} is automatically filled by the button parameter
-        const components = [
-          {
-            type:     'button',
-            sub_type: 'url',
-            index:    '0',
-            parameters: [{ type: 'text', text: otp }],
-          },
-        ];
+        // Debug: verify env vars are loaded
+        if (!env.WHATSAPP_TOKEN || !env.WHATSAPP_PHONE_ID) {
+          return json({
+            success: false,
+            error: 'WhatsApp env vars missing',
+            hasToken: !!env.WHATSAPP_TOKEN,
+            hasPhoneId: !!env.WHATSAPP_PHONE_ID,
+            templateName,
+          }, 500);
+        }
+
+        // hello_world has no variables — empty components
+        const components = [];
+
+
+
+
+
+
+
 
         try {
           const waResult = await sendWhatsApp(phone, templateName, langCode, components);
 
           if (waResult.error) {
             console.error('WA OTP error:', JSON.stringify(waResult.error));
-            return json({ success: false, error: waResult.error.message || 'WhatsApp send failed' }, 502);
+            // Return full Meta error for debugging
+            return json({
+              success: false,
+              error: waResult.error.message || 'WhatsApp send failed',
+              code: waResult.error.code,
+              details: waResult.error,
+            }, 502);
           }
 
           return json({ success: true, message: 'OTP sent via WhatsApp', messageId: waResult.messages?.[0]?.id });
 
         } catch (waErr) {
           console.error('WA OTP exception:', waErr.message);
-          return json({ success: false, error: 'OTP service error' }, 502);
+          return json({ success: false, error: waErr.message, type: waErr.name }, 502);
         }
       }
 
