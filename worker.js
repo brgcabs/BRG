@@ -56,8 +56,8 @@ export default {
 
     // ── WhatsApp API helper ──
     const sendWhatsApp = async (toPhone, templateName, langCode, components) => {
-      const phoneId = env.WHATSAPP_PHONE_ID;
-      const token   = env.WHATSAPP_TOKEN;
+      const phoneId = env.WA_PHONE_NUMBER_ID;
+      const token   = env.WA_ACCESS_TOKEN;
       if (!phoneId || !token) throw new Error('WhatsApp not configured');
 
       // Ensure phone is in international format without + (e.g. 919876543210)
@@ -103,42 +103,25 @@ export default {
           return json({ success: false, error: 'phone and otp are required' }, 400);
         }
 
-        const templateName = env.WA_OTP_TEMPLATE_NAME || 'hello_world';
-        const langCode     = env.WA_TEMPLATE_LANG     || 'en_US';
+        const templateName = env.WA_OTP_TEMPLATE_NAME || 'brgcabs_otp';
+        const langCode     = env.WA_TEMPLATE_LANG || 'en';
 
-        // Debug: verify env vars are loaded
-        if (!env.WHATSAPP_TOKEN || !env.WHATSAPP_PHONE_ID) {
-          return json({
-            success: false,
-            error: 'WhatsApp env vars missing',
-            hasToken: !!env.WHATSAPP_TOKEN,
-            hasPhoneId: !!env.WHATSAPP_PHONE_ID,
-            templateName,
-          }, 500);
-        }
-
-        // hello_world has no variables — empty components
-        const components = [];
-
-
-
-
-
-
-
+        // brgcabs_otp is an Authentication template — uses COPY_CODE button
+        const components = [
+          {
+            type:       'button',
+            sub_type:   'COPY_CODE',
+            index:      '0',
+            parameters: [{ type: 'coupon_code', coupon_code: String(otp) }],
+          },
+        ];
 
         try {
           const waResult = await sendWhatsApp(phone, templateName, langCode, components);
 
           if (waResult.error) {
             console.error('WA OTP error:', JSON.stringify(waResult.error));
-            // Return full Meta error for debugging
-            return json({
-              success: false,
-              error: waResult.error.message || 'WhatsApp send failed',
-              code: waResult.error.code,
-              details: waResult.error,
-            }, 502);
+            return json({ success: false, error: waResult.error.message || 'WhatsApp send failed', code: waResult.error.code, details: waResult.error }, 502);
           }
 
           return json({ success: true, message: 'OTP sent via WhatsApp', messageId: waResult.messages?.[0]?.id });
@@ -366,7 +349,7 @@ export default {
         }
 
         // ── Notify Admin on WhatsApp ──
-        if (env.ADMIN_PHONE && env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_ID) {
+        if (env.ADMIN_PHONE && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
           try {
             const adminMsg = [
               `🚖 *New BRG CABS Booking!*`,
@@ -383,11 +366,11 @@ export default {
             // If admin number is verified in WABA, use template; otherwise use text
             const adminPhoneClean = env.ADMIN_PHONE.replace(/\D/g, '').replace(/^0/, '91');
             await fetch(
-              `https://graph.facebook.com/v19.0/${env.WHATSAPP_PHONE_ID}/messages`,
+              `https://graph.facebook.com/v19.0/${env.WA_PHONE_NUMBER_ID}/messages`,
               {
                 method:  'POST',
                 headers: {
-                  'Authorization': `Bearer ${env.WHATSAPP_TOKEN}`,
+                  'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`,
                   'Content-Type':  'application/json',
                 },
                 body: JSON.stringify({
@@ -427,9 +410,9 @@ export default {
  *  GOOGLE_SCRIPT_URL      ✅
  *  RAZORPAY_KEY_ID        ✅
  *  RAZORPAY_KEY_SECRET    ✅
- *  WHATSAPP_TOKEN         ✅
+ *  WA_ACCESS_TOKEN        ✅
  *  WA_OTP_TEMPLATE_NAME   ✅  (your approved OTP template name)
- *  WHATSAPP_PHONE_ID      ✅
+ *  WA_PHONE_NUMBER_ID     ✅
  *  WA_TEMPLATE_LANG       ✅  (e.g. "en" or "en_US")
  *
  *  OPTIONAL — Add KV namespace binding named "BOOKINGS" for booking storage
