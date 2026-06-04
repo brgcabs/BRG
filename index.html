@@ -1061,7 +1061,7 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
           <div id="h-mc-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px"></div>
           <button type="button" onclick="hAddStop()" style="width:100%;padding:8px;border:1.5px dashed var(--gold);background:rgba(245,197,24,.06);border-radius:10px;color:var(--gold);font-weight:700;font-size:.8rem;cursor:pointer">➕ Add Stop</button>
         </div>
-        <div class="fg"><label>🏁 Drop</label><div class="ac-wrap"><input type="text" id="h-dr" placeholder="To…" autocomplete="off"/><div class="ac-dd" id="hacd-dr"></div></div></div>
+        <div class="fg" id="h-fg-dr"><label id="h-dr-label">🏁 Drop</label><div class="ac-wrap" id="h-dr-acwrap"><input type="text" id="h-dr" placeholder="To…" autocomplete="off"/><div class="ac-dd" id="hacd-dr"></div></div></div>
         <div id="h-distBadge" class="dist-badge"><span>📏</span><span id="h-distTxt"></span></div>
         <div class="fgrid">
           <div class="fg"><label>📅 Date</label><input type="date" id="h-dt"/></div>
@@ -1551,6 +1551,16 @@ document.addEventListener('DOMContentLoaded', () => {
   try { buildFAQ(); } catch(e) {}
   try { initScroll(); } catch(e) {}
   try { setupAC('m-pu','acd-pu','pu'); setupAC('m-dr','acd-dr','dr'); } catch(e) {}
+  // Mirror pickup→drop in real-time when round trip is active
+  const mPuInp = document.getElementById('m-pu');
+  if(mPuInp){
+    mPuInp.addEventListener('input', function(){
+      if(S.trip === 'roundtrip'){
+        const drInput = document.getElementById('m-dr');
+        if(drInput){ drInput.value = this.value; S.dr = this.value; }
+      }
+    });
+  }
   try { setupHeroAC(); } catch(e) {}
 
   // Dropdown closed by its own outside-click handler (mousedown on body)
@@ -1585,8 +1595,45 @@ function setTrip(t){
   // Hero return-date row
   const hRetWrap=document.getElementById('h-retWrap');
   if(hRetWrap) hRetWrap.style.display=t==='roundtrip'?'':'none';
+
+  // ── Round trip: lock Drop = same as Pickup ──
+  _syncRoundTripDrop(t);
+
   if(mStep===2) buildCabResults();
   updateMBtnLabel();
+}
+
+// Mirror pickup into drop field and lock/unlock based on trip type
+function _syncRoundTripDrop(t){
+  const drInput  = document.getElementById('m-dr');
+  const drLabel  = document.querySelector('#fg-dr label');
+  const drACwrap = document.querySelector('#fg-dr .ac-wrap');
+  if(!drInput) return;
+
+  if(t === 'roundtrip'){
+    // Copy current pickup value into drop and lock the field
+    const puVal = document.getElementById('m-pu')?.value || S.pu || '';
+    drInput.value = puVal;
+    S.dr = puVal;
+    drInput.readOnly = true;
+    drInput.style.cssText += ';background:rgba(245,197,24,.07);color:#888;cursor:not-allowed;border-color:rgba(245,197,24,.3)';
+    if(drLabel) drLabel.innerHTML = '🔄 Return To <span style="font-size:.65rem;color:var(--gold);font-weight:700;letter-spacing:.5px">(same as pickup)</span>';
+    if(drACwrap) drACwrap.style.pointerEvents = 'none';
+  } else {
+    // One way — unlock drop field
+    drInput.readOnly = false;
+    drInput.style.cssText = drInput.style.cssText
+      .replace(/background:[^;]+;/g,'')
+      .replace(/color:[^;]+;/g,'')
+      .replace(/cursor:[^;]+;/g,'')
+      .replace(/border-color:[^;]+;/g,'');
+    drInput.style.background = '';
+    drInput.style.color = '';
+    drInput.style.cursor = '';
+    drInput.style.borderColor = '';
+    if(drLabel) drLabel.innerHTML = '🏁 To Location *';
+    if(drACwrap) drACwrap.style.pointerEvents = '';
+  }
 }
 
 function setHTrip(t, btn){
@@ -1627,6 +1674,35 @@ function setHTrip(t, btn){
   // Clear stops
   S.extraCities = [];
   hRenderStops();
+
+  // Lock/unlock hero drop field for round trip
+  _syncHeroRoundTripDrop(t);
+}
+
+function _syncHeroRoundTripDrop(t){
+  const drInput  = document.getElementById('h-dr');
+  const drLabel  = document.getElementById('h-dr-label');
+  const drACwrap = document.getElementById('h-dr-acwrap');
+  if(!drInput) return;
+  if(t === 'roundtrip'){
+    const puVal = document.getElementById('h-pu')?.value || '';
+    drInput.value = puVal;
+    drInput.readOnly = true;
+    drInput.style.background = 'rgba(245,197,24,.07)';
+    drInput.style.color = '#888';
+    drInput.style.cursor = 'not-allowed';
+    drInput.style.borderColor = 'rgba(245,197,24,.3)';
+    if(drLabel) drLabel.innerHTML = '🔄 Return To <span style="font-size:.65rem;color:var(--gold);font-weight:700">(same as pickup)</span>';
+    if(drACwrap) drACwrap.style.pointerEvents = 'none';
+  } else {
+    drInput.readOnly = false;
+    drInput.style.background = '';
+    drInput.style.color = '';
+    drInput.style.cursor = '';
+    drInput.style.borderColor = '';
+    if(drLabel) drLabel.innerHTML = '🏁 Drop';
+    if(drACwrap) drACwrap.style.pointerEvents = '';
+  }
 }
 
 function updateMBtnLabel(){document.getElementById('mBtnNext').textContent = S.step===1 ? 'Search Cabs →' : S.step===2 ? 'Continue →' : S.step===3 ? 'Send OTP →' : 'Verify →';}
@@ -1860,14 +1936,57 @@ function confirmExtraCity(idx,inpId,rowId){
   if(!val){toast('⚠️ Please enter a city name');return;}
   S.extraCities[idx]=val;
   _renderExtraCities();
-  // Re-estimate distance with stops
-  estimateDist();
+  estimateModalDist();   // recalculate through all stops
 }
 
 function removeExtraCity(i){
   S.extraCities.splice(i,1);
   _renderExtraCities();
-  estimateDist();
+  estimateModalDist();   // recalculate through remaining stops
+}
+
+// ── Modal multi-stop distance estimator
+// Mirrors estimateHeroDistMultiStop but reads from modal inputs (m-pu / m-dr)
+// and updates S.distKm + dist-badge + cab list.
+async function estimateModalDist(){
+  const pu = document.getElementById('m-pu')?.value.trim() || S.pu;
+  const dr = document.getElementById('m-dr')?.value.trim() || S.dr;
+  if(!pu || !dr){ estimateDist(); return; }
+
+  const stops     = (S.extraCities || []).filter(c => c.trim());
+  // No stops — just do the simple A→B fetch
+  if(!stops.length){ estimateDist(); return; }
+
+  if(!WORKER || WORKER.includes('YOUR-SUBDOMAIN')){ fallbackDist(); return; }
+
+  const waypoints = [pu, ...stops, dr];
+  showDistBadge('Calculating…', 'estimated');
+
+  try {
+    let totalKm = 0;
+    let totalDur = 0; // minutes
+    for(let i = 0; i < waypoints.length - 1; i++){
+      const resp = await fetch(
+        `${WORKER}/api/distance?origin=${encodeURIComponent(waypoints[i])}&destination=${encodeURIComponent(waypoints[i+1])}`
+      );
+      const d = await resp.json();
+      if(d && d.distanceKm){
+        totalKm += d.distanceKm;
+        if(d.durationMins) totalDur += d.durationMins;
+      } else {
+        throw new Error('Leg '+i+' failed');
+      }
+    }
+    S.distKm = totalKm;
+    const label = stops.length > 0
+      ? `~${totalKm.toLocaleString('en-IN')} km via ${stops.length} stop${stops.length>1?'s':''}`
+      : `~${totalKm.toLocaleString('en-IN')} km`;
+    showDistBadge(label, totalDur > 0 ? Math.floor(totalDur/60)+'h '+(totalDur%60)+'m' : 'estimated');
+    if(mStep === 2) buildCabResults();
+  } catch(err){
+    console.warn('Modal multi-stop distance failed:', err.message);
+    fallbackDist();
+  }
 }
 
 // ── Hero inputs — use _attachAC for consistent portal/blur behaviour
@@ -1896,12 +2015,28 @@ function setupHeroAC() {
   }
   puInp.addEventListener('input', _heroClearDist);
   drInp.addEventListener('input', _heroClearDist);
+  // Mirror pickup→drop live when round trip selected
+  puInp.addEventListener('input', function(){
+    if(S.hTrip === 'roundtrip'){
+      const hDr = document.getElementById('h-dr');
+      if(hDr) hDr.value = this.value;
+    }
+  });
 }
 
 function selectAC(inputId, dropId, key, name){
   document.getElementById(inputId).value = name;
   document.getElementById(dropId).classList.remove('open');
-  if(key==='pu') S.pu=name; else S.dr=name;
+  if(key==='pu'){
+    S.pu = name;
+    // Round trip: keep drop = pickup automatically
+    if(S.trip === 'roundtrip'){
+      const drInput = document.getElementById('m-dr');
+      if(drInput){ drInput.value = name; S.dr = name; }
+    }
+  } else {
+    S.dr = name;
+  }
   estimateDist();
   if(mStep===2) buildCabResults();
 }
@@ -1909,6 +2044,11 @@ function selectAC(inputId, dropId, key, name){
 function selHAC(inputId, dropId, name){
   document.getElementById(inputId).value=name;
   document.getElementById(dropId).classList.remove('open');
+  // If pickup selected on round trip, mirror to drop field
+  if(inputId === 'h-pu' && S.hTrip === 'roundtrip'){
+    const hDr = document.getElementById('h-dr');
+    if(hDr){ hDr.value = name; }
+  }
   estimateHeroDist();
 }
 
@@ -1960,15 +2100,23 @@ function _updateHeroBadgeText(){
   const isRound = S.hTrip === 'roundtrip';
 
   if(isRound){
-    // Round trip: show both one-way leg distance AND total round-trip distance + duration
-    const totalKm   = km * 2;
-    const totalMins = durationMins * 2;
-    const hrs  = Math.floor(totalMins / 60);
-    const mins = totalMins % 60;
-    const rtDur = totalMins > 0
-      ? ` · ~${hrs > 0 ? hrs + 'h ' : ''}${mins}m total`
-      : (durText ? ` · ~${durText} each way` : '');
-    badgeTxt.textContent = `${distText} each way · ${totalKm.toLocaleString('en-IN')} km total${rtDur}`;
+    const stops = (S.extraCities || []).filter(c => c.trim());
+    if(stops.length > 0){
+      // Multi-stop round trip: _heroKm already = full loop distance (Pickup→Stops→Drop)
+      // No multiplication needed — just show the total as-is
+      const durSuffix = durText ? ` · ~${durText}` : '';
+      badgeTxt.textContent = `${distText}${durSuffix}`;
+    } else {
+      // Simple A→B round trip (no stops): _heroKm = one-way leg, so ×2 for full round trip
+      const totalKm   = km * 2;
+      const totalMins = durationMins * 2;
+      const hrs  = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      const rtDur = totalMins > 0
+        ? ` · ~${hrs > 0 ? hrs + 'h ' : ''}${mins}m total`
+        : (durText ? ` · ~${durText} each way` : '');
+      badgeTxt.textContent = `${distText} each way · ${totalKm.toLocaleString('en-IN')} km total${rtDur}`;
+    }
   } else {
     // One way: show distance and duration normally
     const durSuffix = durText ? ` · ~${durText}` : '';
@@ -2021,8 +2169,11 @@ function heroDistFallback(){
   if(!km){
     const pu = document.getElementById('h-pu').value.trim();
     const dr = document.getElementById('h-dr').value.trim();
-    if(!pu || !dr) return;                     // nothing entered — nothing to show
-    // Rough km estimate: count characters as a proxy (demo only, not shown as real)
+    if(!pu || !dr) return;  // nothing entered — nothing to show
+    // If pickup = drop (e.g. round trip same city), don't show a demo distance.
+    // Wait for the user to add stops so the API can return a real distance.
+    if(pu.toLowerCase() === dr.toLowerCase()) return;
+    // Worker unreachable (local file:// mode) — show demo so UI is testable
     km = 150;
     badge.dataset.distText     = '~150 km (demo)';
     badge.dataset.durText      = '3 hours';
@@ -2239,7 +2390,24 @@ function step1next(){
     if(!S.retdate){ toast('⚠️ Please select a return date for round trip'); ok=false; }
     else if(S.date && new Date(S.retdate) <= new Date(S.date)){ toast('⚠️ Return date must be after pickup date'); ok=false; }
   }
-  if(ok){if(!S.distKm)fallbackDist();goStep(2);}
+  if(ok){
+    if(!S.distKm){
+      // For round trips with same pickup/drop (city tours with stops), don't use fallback 50km.
+      // Fetch real distance first, then go to step 2.
+      const isSameCity = S.pu && S.dr && S.pu.toLowerCase() === S.dr.toLowerCase();
+      if(isSameCity && S.trip === 'roundtrip'){
+        // No meaningful A→B distance — wait for user to add stops or use 0 for now
+        // Show cab list with minimum fare (250km/day)
+        S.distKm = 0;
+        goStep(2);
+      } else {
+        fallbackDist();
+        goStep(2);
+      }
+    } else {
+      goStep(2);
+    }
+  }
 }
 
 function step2next(){
@@ -2285,30 +2453,68 @@ function buildCabResults(){
     ?`Round Trip${extraStops?' · '+extraStops+' stop'+(extraStops>1?'s':''):''}`
     :`One Way${extraStops?' · '+extraStops+' stop'+(extraStops>1?'s':''):''}`;
 
-  const MIN_KM_DAY=250;
+  const MIN_KM_DAY = 250;
   if(isRound){
-    const kmPerDay=Math.max(km*2,MIN_KM_DAY);
-    const totalKm=kmPerDay*numDays;
-    document.getElementById('rs-km').textContent=
-      `~${km} km × 2 × ${numDays} day${numDays>1?'s':''} (min ${MIN_KM_DAY}km/day) = ~${totalKm} km + ₹${numDays*300} driver allowance`+
-      (extraStops?` · Via: ${extraList.join(' → ')}`:'');
+    /*
+     * ROUND TRIP BILLING RULE (taxi industry standard):
+     *
+     *   S.distKm = TOTAL actual km the customer travels, already computed by Google Maps
+     *              across ALL legs: Pickup → Stop1 → Stop2 → … → Drop (back to start).
+     *              e.g. Delhi→Agra(230) + Agra→Lucknow(300) + Lucknow→Kanpur(100) + Kanpur→Delhi(600) = 1,230 km
+     *              NO multiplication needed — distKm already IS the full round-trip distance.
+     *
+     *   Minimum km billed = 250 × numDays  (taxi rule: min 250 km per rented day)
+     *   Billed km         = max(actualKm, minTotal)  ← whichever is HIGHER
+     *   Fare              = billedKm × rateRound  +  numDays × ₹300 driver allowance
+     */
+    const actualKm = km;                             // distKm IS the total distance (no ×2)
+    const minTotal = MIN_KM_DAY * numDays;           // taxi rule: 250 km × no. of days hired
+    const billedKm = Math.max(actualKm, minTotal);   // bill whichever is higher
+    const usingMin = km === 0 || actualKm <= minTotal;
+    const isSameCity = (S.pu||'').trim().toLowerCase() === (S.dr||'').trim().toLowerCase();
+
+    let kmLabel;
+    if(isSameCity && extraStops === 0){
+      // Same pickup & drop, no stops — bill purely on minimum rule (no actual route distance)
+      kmLabel = `Local round trip · Min ${MIN_KM_DAY} km/day × ${numDays} day${numDays>1?'s':''} = ${billedKm.toLocaleString('en-IN')} km billed`;
+    } else if(usingMin){
+      // Actual trip shorter than minimum threshold — minimum rule applies
+      kmLabel = `Min ${MIN_KM_DAY} km/day × ${numDays} day${numDays>1?'s':''} = ${billedKm.toLocaleString('en-IN')} km billed`;
+    } else {
+      // Actual distance exceeds minimum — bill actual total km
+      kmLabel = `~${km.toLocaleString('en-IN')} km actual (> ${minTotal.toLocaleString('en-IN')} km minimum) = ~${billedKm.toLocaleString('en-IN')} km billed`;
+    }
+    if(extraStops > 0) kmLabel += ` · Via: ${extraList.join(' → ')}`;
+    document.getElementById('rs-km').textContent = kmLabel + ` + ₹${(numDays*300).toLocaleString('en-IN')} driver allowance`;
   } else {
-    document.getElementById('rs-km').textContent=`~${km} km`+(extraStops?` via ${extraList.join(' → ')}`:'')+
-      (extraStops?' (+15% per stop)':'');
+    // ONE WAY: bill actual A→B distance only
+    document.getElementById('rs-km').textContent =
+      `~${km} km` +
+      (extraStops ? ` via ${extraList.join(' → ')}` : '') +
+      (extraStops ? ' (+15% per stop)' : '');
   }
 
   document.getElementById('cabList').innerHTML=VEHICLES.map((v,i)=>{
+    /*
+     * FARE CALCULATION
+     * ONE WAY   : fare = actual A→B km × one-way rate  (+flat minimum if <100 km)
+     * ROUND TRIP: S.distKm already = total km across ALL legs (no multiplication needed)
+     *             billedKm = max(distKm, 250×numDays)  →  higher of actual vs minimum rule
+     *             fare     = billedKm × roundRate  +  numDays × ₹300 driver allowance
+     */
     let fare;
     if(isRound){
-      const kmPerDay=Math.max(km*2,MIN_KM_DAY);
-      const totalKm=kmPerDay*numDays;
-      fare=Math.ceil(totalKm*v.rateRound)+(numDays*300);
+      // distKm = total actual distance already (Google Maps sums all legs including return)
+      const actualKm = km;                             // no ×2 — distKm IS the full loop
+      const minTotal = MIN_KM_DAY * numDays;           // 250 km × number of days hired
+      const billedKm = Math.max(actualKm, minTotal);   // bill whichever is higher
+      fare = Math.ceil(billedKm * v.rateRound) + (numDays * 300); // +₹300/day driver allowance
     } else {
-      // One-way (+stops): apply minimum flat fare if under 100 km; +15% per extra stop
-      const perKmFare=Math.ceil(km*v.rate);
-      const minFare=MIN_FARES[v.key]||0;
-      const baseFare=km<100?Math.max(perKmFare,minFare):perKmFare;
-      fare=extraStops?Math.ceil(baseFare*(1+0.15*extraStops)):baseFare;
+      // ONE WAY: bill actual A→B distance only; flat minimum for short trips (<100 km)
+      const perKmFare = Math.ceil(km * v.rate);
+      const minFare   = MIN_FARES[v.key] || 0;
+      const baseFare  = km < 100 ? Math.max(perKmFare, minFare) : perKmFare;
+      fare = extraStops ? Math.ceil(baseFare * (1 + 0.15 * extraStops)) : baseFare;
     }
     const adv=Math.ceil(fare*0.10/10)*10;
     const rateLabel=isRound?v.rateRound:v.rate;
@@ -2705,10 +2911,64 @@ function heroSearch(){
   const mRet = document.getElementById('m-ret');
   if(ret && mRet) mRet.value = ret;
 
-  // Distance known — show badge and skip straight to cab selection
+  // ── Special case: same pickup & drop (local round trip, no route distance)
+  // Bill purely on minimum km rule: 250 km/day × number of days hired
+  const isSameCity = S.pu.trim().toLowerCase() === S.dr.trim().toLowerCase();
+  if(isSameCity && S.trip === 'roundtrip' && !S.distKm){
+    const numDays = calcRoundTripDays();
+    const minKm   = 250 * numDays;
+    S.distKm = minKm;
+    showDistBadge(`Min ${minKm.toLocaleString('en-IN')} km (${numDays} day${numDays>1?'s':''} × 250 km/day)`, '');
+    setTimeout(() => goStep(2), 150);
+    return;
+  }
+
+  // Distance already known — go straight to step 2
   if(S.distKm > 0){
     showDistBadge(S.distKm + ' km', '');
     setTimeout(() => goStep(2), 150);
+  } else {
+    // Distance not yet fetched — fetch now, go to step 2 immediately while it loads
+    if(S.pu && S.dr){
+      const stops = (S.extraCities || []).filter(c => c.trim());
+      const waypoints = [S.pu, ...stops, S.dr];
+
+      showDistBadge('Calculating…', 'estimated');
+      setTimeout(() => goStep(2), 150);
+
+      if(WORKER && !WORKER.includes('YOUR-SUBDOMAIN')){
+        (async () => {
+          try {
+            let totalKm = 0;
+            for(let i = 0; i < waypoints.length - 1; i++){
+              const resp = await fetch(
+                `${WORKER}/api/distance?origin=${encodeURIComponent(waypoints[i])}&destination=${encodeURIComponent(waypoints[i+1])}`
+              );
+              const d = await resp.json();
+              if(d && d.distanceKm) totalKm += d.distanceKm;
+              else throw new Error('leg '+i+' failed');
+            }
+            S.distKm = totalKm;
+            const label = stops.length > 0
+              ? `~${totalKm.toLocaleString('en-IN')} km via ${stops.length} stop${stops.length>1?'s':''}`
+              : `~${totalKm.toLocaleString('en-IN')} km`;
+            showDistBadge(label, '');
+            buildCabResults();
+          } catch(e){
+            if(!S.distKm) S.distKm = 50;
+            showDistBadge(`~${S.distKm} km`, 'estimated');
+            buildCabResults();
+          }
+        })();
+      } else {
+        if(!S.distKm) S.distKm = 50;
+        showDistBadge(`~${S.distKm} km`, 'estimated');
+        buildCabResults();
+      }
+    } else {
+      // Missing pickup or drop — stay on step 1
+      goStep(1);
+    }
   }
 }
 
