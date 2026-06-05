@@ -11,6 +11,47 @@
 <meta name="theme-color" content="#0A0A0A"/>
 <meta name="robots" content="index, follow"/>
 <meta name="facebook-domain-verification" content="tnvpisjztdv3wcjriqjdwus9vyxtlc" />
+
+<!-- ══ META PIXEL CODE ══ -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '975540445234614'); // BRG CABS Pixel ID
+fbq('track', 'PageView');
+
+// ── BRG CABS Custom Event Helpers ──────────────────────────
+// Call fbqLead() when booking form is submitted
+window.fbqLead = function(tripType) {
+  fbq('track', 'Lead', { content_name: tripType || 'Cab Booking' });
+};
+// Call fbqContact() when phone/WhatsApp button is clicked
+window.fbqContact = function() {
+  fbq('track', 'Contact');
+};
+// Call fbqViewContent(name) when a service page/section is viewed
+window.fbqViewContent = function(serviceName) {
+  fbq('track', 'ViewContent', { content_name: serviceName });
+};
+// Call fbqInitiateCheckout() when user reaches payment step
+window.fbqInitiateCheckout = function(fare) {
+  fbq('track', 'InitiateCheckout', { value: fare, currency: 'INR' });
+};
+// Call fbqPurchase() after Razorpay payment is verified successfully
+window.fbqPurchase = function(fare, bookingId) {
+  fbq('track', 'Purchase', { value: fare, currency: 'INR', content_ids: [bookingId] });
+};
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=975540445234614&ev=PageView&noscript=1"/>
+</noscript>
+<!-- ══ END META PIXEL CODE ══ -->
 <meta name="geo.region" content="IN-DL"/>
 <meta name="geo.placename" content="Uttam Nagar, New Delhi"/>
 
@@ -3889,6 +3930,9 @@ async function triggerRazorpay(){
           // 6. Verified ✅ — show success UI
           var payId   = response.razorpay_payment_id;
           var balance = (S.totalFare || 0) - amount;
+
+          // ── META PIXEL: Track Purchase ──
+          if(typeof fbqPurchase === 'function') fbqPurchase(S.totalFare || amount, S.bookingId);
 
           var payPanel = document.getElementById('payPanel');
           if(payPanel) payPanel.style.display = 'none';
