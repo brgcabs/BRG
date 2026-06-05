@@ -984,7 +984,7 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
         <div class="confirm-wrap">
           <div class="confirm-ic">✓</div>
           <h3 style="font-family:var(--font-h);font-size:1.9rem;letter-spacing:2px;margin-bottom:7px">BOOKING CONFIRMED!</h3>
-          <p style="color:var(--gray);font-size:.88rem;margin-bottom:6px;line-height:1.7">Your cab is confirmed. Our team will call you shortly to assign a driver.</p>
+          <p style="color:var(--gray);font-size:.88rem;margin-bottom:6px;line-height:1.7">Payment received! Your booking is confirmed. Our team will call you shortly to assign a driver.</p>
           <div class="booking-ref" id="bkRef">BRG-000000</div>
           <div class="bk-sum" id="bkSumFinal" style="text-align:left"></div>
           <!-- ── PAYMENT OPTIONS PANEL ── -->
@@ -2680,11 +2680,11 @@ async function verifyOTP(){
     if(data.success && data.verified){
       _sessionToken = data.sessionToken || S.bookingId;
       btn.textContent = orig; btn.disabled = false;
-      toast('✅ OTP verified!');
+      toast('✅ OTP verified! Please complete payment to confirm your booking.');
+      notifyAdmin();
       goStep(5);
       document.getElementById('bkRef').textContent = S.bookingId;
       document.getElementById('bkSumFinal').innerHTML = buildSummaryHTML();
-      notifyAdmin();
     } else {
       btn.textContent = orig; btn.disabled = false;
       const msg = data.error || 'Invalid OTP';
@@ -2815,7 +2815,7 @@ function buildSummaryHTML(){
   const extraList=S.extraCities&&S.extraCities.length?S.extraCities:[];
   return `
     <div class="bk-row"><span class="bl">Passenger</span><span class="bv">${S.name} · +91 ${S.phone}</span></div>
-    <div class="bk-row"><span class="bl">Vehicle</span><span class="bv">${S.vehicleName} · ₹${S.rate}/km</span></div>
+    <div class="bk-row"><span class="bl">Vehicle</span><span class="bv">${S.vehicleName}</span></div>
     <div class="bk-row"><span class="bl">Trip</span><span class="bv">${S.trip==='roundtrip'?'Round Trip':'One Way'}${(S.extraCities&&S.extraCities.length)?' · '+S.extraCities.length+' stop(s)':''}</span></div>
     <div class="bk-row"><span class="bl">Pickup</span><span class="bv">${S.pu}</span></div>
     ${extraList.map((c,i)=>`<div class="bk-row"><span class="bl">Stop ${i+1}</span><span class="bv">${c}</span></div>`).join('')}
@@ -3904,7 +3904,9 @@ async function triggerRazorpay(){
                   ? '<br><span style="font-size:.78rem;color:#616161">Balance ₹' + balance.toLocaleString('en-IN') + ' to be paid to driver</span>'
                   : '<br><span style="font-size:.78rem;color:#22C55E">Full fare covered ✓</span>');
           }
-          toast('✅ ₹' + amount.toLocaleString('en-IN') + ' paid & verified!');
+          toast('✅ ₹' + amount.toLocaleString('en-IN') + ' paid & confirmed!');
+          var confirmWrap = document.querySelector('#mS5 .confirm-wrap');
+          if(confirmWrap) setTimeout(function(){ confirmWrap.scrollIntoView({ behavior:'smooth', block:'start' }); }, 300);
 
           // 7. Notify admin — GAS sheet log + Worker WhatsApp alert
           var paymentRecord = {
@@ -3924,7 +3926,33 @@ async function triggerRazorpay(){
           var params = new URLSearchParams({ action: 'payment', data: JSON.stringify(paymentRecord) });
           fetch(GAS_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(function(){});
 
-          // 7b. Worker → dedicated payment notify → WhatsApp alert to admin
+          // 7b. Booking notify → admin alert (trip details) + customer booking confirmation
+          fetch(WORKER + '/api/booking/notify', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ booking: {
+              id:          S.bookingId,
+              name:        S.name,
+              phone:       S.phone,
+              email:       S.email  || '',
+              pickup:      S.pu,
+              drop:        S.dr,
+              from:        S.pu,
+              to:          S.dr,
+              date:        S.date,
+              time:        S.time,
+              vehicleName: S.vehicleName,
+              vehicle:     S.vehicleName,
+              tripType:    S.trip,
+              totalFare:   S.totalFare,
+              fare:        S.totalFare,
+              advAmt:      amount,
+              advance:     amount,
+              notes:       S.notes || ''
+            }})
+          }).catch(function(e){ console.error('booking/notify failed:', e); });
+
+          // 7c. Payment notify → admin payment alert + customer payment receipt
           fetch(WORKER + '/api/payment/notify', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3939,7 +3967,7 @@ async function triggerRazorpay(){
               name:        S.name,
               phone:       S.phone
             })
-          }).catch(function(){});
+          }).catch(function(e){ console.error('payment/notify failed:', e); });
 
         } catch(verifyErr){
           toast('⚠️ Verification error — contact support with Payment ID: ' + response.razorpay_payment_id);

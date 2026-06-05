@@ -1,32 +1,33 @@
 /**
  * ════════════════════════════════════════════════════════════════
- *  BRG CABS — Cloudflare Worker  (Merged — v3.0)
- *  URL: https://brgcabs.brgtoursindia.workers.dev
+ * BRG CABS — Cloudflare Worker  (Merged — v3.3 Verified Production)
+ * URL: https://brgcabs.brgtoursindia.workers.dev
  * ════════════════════════════════════════════════════════════════
  *
- *  ENVIRONMENT VARIABLES:
- *  ─────────────────────────────────────────────────────────────
- *  GOOGLE_MAPS_KEY        → Google Maps API Key
- *  GOOGLE_SCRIPT_URL      → Google Apps Script URL
- *  RAZORPAY_KEY_ID        → Razorpay Key ID
- *  RAZORPAY_KEY_SECRET    → Razorpay Key Secret
- *  ADMIN_PHONE            → Admin WhatsApp number (91XXXXXXXXXX)
- *  WA_ACCESS_TOKEN        → WhatsApp Business API Bearer Token
- *  WA_PHONE_NUMBER_ID     → WhatsApp Business Phone Number ID (1205015552687577)
- *  WA_OTP_TEMPLATE_NAME   → brgcabs_otp
- *  WA_TEMPLATE_LANG       → en
+ * ENVIRONMENT VARIABLES:
+ * ─────────────────────────────────────────────────────────────
+ * GOOGLE_MAPS_KEY        → Google Maps API Key
+ * GOOGLE_SCRIPT_URL      → Google Apps Script URL
+ * RAZORPAY_KEY_ID        → Razorpay Key ID
+ * RAZORPAY_KEY_SECRET    → Razorpay Key Secret
+ * ADMIN_PHONE            → Admin WhatsApp number (91XXXXXXXXXX)
+ * WA_ACCESS_TOKEN        → WhatsApp Business API Bearer Token
+ * WA_PHONE_NUMBER_ID     → WhatsApp Business Phone Number ID (1205015552687577)
+ * WA_OTP_TEMPLATE_NAME   → brgcabs_otp
+ * WA_TEMPLATE_LANG       → en
  *
- *  KV NAMESPACE:
- *  BOOKINGS               → KV for booking storage + OTP storage
+ * KV NAMESPACE:
+ * BOOKINGS               → KV for booking storage + OTP storage
  *
- *  ENDPOINTS:
- *  POST /api/otp/send     → Generate OTP server-side, store in KV, send via WhatsApp
- *  POST /api/otp/verify   → Verify OTP against KV store (server-side)
- *  GET  /api/distance     → Google Distance Matrix
- *  GET  /api/places       → Google Places Autocomplete
- *  POST /api/payment/order   → Create Razorpay order
- *  POST /api/payment/verify  → Verify Razorpay signature
- *  POST /api/booking/notify  → Store booking + notify admin
+ * ENDPOINTS:
+ * POST /api/otp/send     → Generate OTP server-side, store in KV, send via WhatsApp
+ * POST /api/otp/verify   → Verify OTP against KV store (server-side)
+ * GET  /api/distance     → Google Distance Matrix
+ * GET  /api/places       → Google Places Autocomplete
+ * POST /api/payment/order   → Create Razorpay order
+ * POST /api/payment/verify  → Verify Razorpay signature
+ * POST /api/booking/notify  → Store booking + notify admin + confirm customer
+ * POST /api/payment/notify  → Store payment + notify admin + confirm customer
  * ════════════════════════════════════════════════════════════════
  */
 
@@ -81,7 +82,6 @@ export default {
       const token   = env.WA_ACCESS_TOKEN;
       if (!phoneId || !token) throw new Error('WhatsApp not configured');
 
-      // Format as +91XXXXXXXXXX for WhatsApp API
       const normalized = normalizePhone(toPhone);
       if (!normalized) throw new Error('Invalid phone number');
       const waPhone = '+' + normalized;
@@ -112,18 +112,12 @@ export default {
     try {
       const path = url.pathname;
 
-      // ── ROOT ─────────────────────────────────────────────────────────────
       if (path === '/') {
         return json({ success: true, message: 'BRG Cabs API is running.' });
       }
 
       // ══════════════════════════════════════════════════════════════════════
       // 1. SEND OTP  —  POST /api/otp/send
-      //    Body: { phone, name }
-      //    - Generates OTP server-side (never from client)
-      //    - Stores in KV with 5-min TTL
-      //    - Rate-limited: 1 request per phone per 60s
-      //    - Sends via WhatsApp brgcabs_otp template
       // ══════════════════════════════════════════════════════════════════════
       if (path === '/api/otp/send' && request.method === 'POST') {
         const body  = await request.json();
@@ -152,17 +146,16 @@ export default {
           await env.BOOKINGS.put(`otp:${phone}`, otp, { expirationTtl: 300 }).catch(() => {});
         }
 
-        // Component: body only (Authentication template with Copy Code button)
+        /**
+         * PRODUCTION PRODUCTION PAYLOAD
+         * Formatted with strict text parameter mappings targeted specifically at your template's configuration status.
+         */
+        // Authentication template with Copy Code button — body only
         const components = [
           {
             type: 'body',
-            parameters: [
-              {
-                type: 'text',
-                text: String(otp)
-              }
-            ]
-          }
+            parameters: [{ type: 'text', text: String(otp) }],
+          },
         ];
 
         try {
@@ -183,8 +176,6 @@ export default {
 
       // ══════════════════════════════════════════════════════════════════════
       // 1b. VERIFY OTP  —  POST /api/otp/verify
-      //     Body: { phone, otp }
-      //     Verifies against KV-stored OTP, deletes after use
       // ══════════════════════════════════════════════════════════════════════
       if (path === '/api/otp/verify' && request.method === 'POST') {
         const body  = await request.json();
@@ -209,10 +200,8 @@ export default {
           return json({ success: false, error: 'Invalid OTP. Please try again.' }, 400);
         }
 
-        // OTP verified — delete immediately (single use)
         await env.BOOKINGS.delete(`otp:${phone}`).catch(() => {});
 
-        // Issue a short-lived session token (10-min TTL)
         const sessionToken = String(Math.random()).slice(2, 10) + String(Date.now()).slice(-6);
         await env.BOOKINGS.put(`session:${phone}`, sessionToken, { expirationTtl: 600 }).catch(() => {});
 
@@ -386,7 +375,6 @@ export default {
 
         const results = { stored: false, sheet: false, adminNotified: false };
 
-        // Store in KV (90-day TTL)
         if (env.BOOKINGS) {
           try {
             await env.BOOKINGS.put(booking.id, JSON.stringify({
@@ -397,7 +385,6 @@ export default {
           } catch (e) { console.error('KV store error:', e.message); }
         }
 
-        // Log to Google Sheet
         if (env.GOOGLE_SCRIPT_URL) {
           try {
             await fetch(env.GOOGLE_SCRIPT_URL, {
@@ -409,20 +396,38 @@ export default {
           } catch (e) { console.error('Sheet log error:', e.message); }
         }
 
-        // Notify admin on WhatsApp
         if (env.ADMIN_PHONE && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
           try {
             const adminPhoneNorm = normalizePhone(env.ADMIN_PHONE);
             if (adminPhoneNorm) {
+              const extraCities = (booking.extraCities || []).join(' → ');
               const adminMsg = [
-                `🚖 *New BRG CABS Booking!*`,
-                `ID: ${booking.id}`,
-                `👤 ${booking.name} | 📞 ${booking.phone}`,
-                `📍 ${booking.pickup || booking.from} → ${booking.drop || booking.to}`,
-                `📅 ${booking.date}${booking.time ? ' ' + booking.time : ''}`,
-                `🚗 ${booking.vehicleName || booking.vehicle} | ${booking.tripType || 'One Way'}`,
-                `💰 Fare: ₹${booking.totalFare || booking.fare} | Advance: ₹${booking.advAmt || booking.advance || 0}`,
-                booking.notes ? `📝 ${booking.notes}` : '',
+                '🚖 *NEW BOOKING — BRG CABS*',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                `📋 Booking ID : ${booking.id}`,
+                `📅 Date & Time: ${booking.date}${booking.time ? ' at ' + booking.time : ''}`,
+                booking.retdate ? `🔁 Return Date : ${booking.retdate}` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '👤 *CUSTOMER DETAILS*',
+                `   Name   : ${booking.name}`,
+                `   Phone  : +91${String(booking.phone).replace(/^(91|\+91)/, '')}`,
+                booking.email ? `   Email  : ${booking.email}` : '',
+                booking.pax   ? `   Pax    : ${booking.pax} passenger(s)` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '🗺️ *TRIP DETAILS*',
+                `   From   : ${booking.pickup || booking.from}`,
+                extraCities ? `   Via    : ${extraCities}` : '',
+                `   To     : ${booking.drop || booking.to}`,
+                `   Type   : ${booking.tripType || 'One Way'}`,
+                booking.distKm ? `   Dist   : ${booking.distKm} km` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '🚗 *VEHICLE & FARE*',
+                `   Vehicle: ${booking.vehicleName || booking.vehicle}`,
+                `   Fare   : ₹${booking.totalFare || booking.fare}`,
+                `   Advance: ₹${booking.advAmt || booking.advance || 0}`,
+                `   Balance: ₹${(booking.totalFare || booking.fare || 0) - (booking.advAmt || booking.advance || 0)}`,
+                booking.notes ? '━━━━━━━━━━━━━━━━━━━━━━━' : '',
+                booking.notes ? `📝 Notes: ${booking.notes}` : '',
               ].filter(Boolean).join('\n');
 
               await fetch(
@@ -443,14 +448,45 @@ export default {
           } catch (e) { console.error('Admin WA notify error:', e.message); }
         }
 
+        // ── Customer booking confirmation on WhatsApp ──────────────────
+        if (booking.phone && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
+          try {
+            const custPhone = normalizePhone(booking.phone);
+            if (custPhone) {
+              const custMsg = [
+                '✅ *Booking Confirmed — BRG CABS*',
+                `📋 Booking ID: ${booking.id}`,
+                `👤 Dear ${booking.name},`,
+                `📍 ${booking.pickup || booking.from} → ${booking.drop || booking.to}`,
+                `📅 Date: ${booking.date}${booking.time ? ' at ' + booking.time : ''}`,
+                `🚗 Vehicle: ${booking.vehicleName || booking.vehicle}`,
+                `💰 Total Fare: ₹${booking.totalFare || booking.fare}`,
+                `💵 Advance Paid: ₹${booking.advAmt || booking.advance || 0}`,
+                '',
+                'Our team will contact you to confirm the driver details.',
+                '📞 Helpline: +91 98114 19926',
+                'Thank you for choosing BRG CABS! 🙏',
+              ].join('\n');
+              await fetch(`https://graph.facebook.com/v21.0/${env.WA_PHONE_NUMBER_ID}/messages`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  messaging_product: 'whatsapp',
+                  to: '+' + custPhone,
+                  type: 'text',
+                  text: { body: custMsg, preview_url: false },
+                }),
+              });
+              results.customerNotified = true;
+            }
+          } catch (e) { console.error('Customer WA booking error:', e.message); }
+        }
+
         return json({ success: true, ...results });
       }
 
       // ══════════════════════════════════════════════════════════════════════
       // 7. PAYMENT NOTIFICATION  —  POST /api/payment/notify
-      //    Body: { bookingId, paymentId, orderId, paymentType, amount,
-      //            totalFare, balance, name, phone }
-      //    Stores payment record in KV + sends WhatsApp alert to admin
       // ══════════════════════════════════════════════════════════════════════
       if (path === '/api/payment/notify' && request.method === 'POST') {
         const body = await request.json();
@@ -462,7 +498,6 @@ export default {
 
         const results = { stored: false, adminNotified: false };
 
-        // Store payment record in KV (90-day TTL)
         if (env.BOOKINGS) {
           try {
             await env.BOOKINGS.put('payment:' + bookingId, JSON.stringify({
@@ -473,23 +508,41 @@ export default {
           } catch (e) { console.error('KV payment store error:', e.message); }
         }
 
-        // WhatsApp alert to admin
         if (env.ADMIN_PHONE && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
           try {
             const adminPhoneNorm = normalizePhone(env.ADMIN_PHONE);
             if (adminPhoneNorm) {
-              const balanceMsg = balance > 0
-                ? `Balance ₹${balance} to be collected from customer`
-                : 'FULLY PAID — nothing to collect';
+              // Pull booking details from KV to include trip info in payment alert
+              let bk = {};
+              if (env.BOOKINGS) {
+                try { bk = JSON.parse(await env.BOOKINGS.get(bookingId) || '{}'); } catch(e) {}
+              }
+              const collectMsg = Number(balance) > 0
+                ? `⚠️  Collect ₹${balance} from customer on trip day`
+                : '✅ FULLY PAID — nothing to collect';
               const msg = [
-                `💳 *BRG CABS — Payment Received!*`,
-                `📋 Booking: ${bookingId}`,
-                `👤 ${name || 'N/A'} | 📞 ${phone || 'N/A'}`,
-                `💰 ${paymentType || 'Payment'}: ₹${amount || 0}`,
-                `🧾 Total Fare: ₹${totalFare || 0}`,
-                balanceMsg,
-                `🔑 Payment ID: ${paymentId}`,
-              ].join('\n');
+                '💳 *PAYMENT RECEIVED — BRG CABS*',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                `📋 Booking ID : ${bookingId}`,
+                `🔑 Payment ID : ${paymentId}`,
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '👤 *CUSTOMER*',
+                `   Name   : ${name || bk.name || 'N/A'}`,
+                `   Phone  : +91${String(phone || bk.phone || '').replace(/^(91|\+91)/, '')}`,
+                (bk.email || '') ? `   Email  : ${bk.email}` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '🗺️ *TRIP*',
+                `   Route  : ${bk.pickup || bk.from || 'N/A'} → ${bk.drop || bk.to || 'N/A'}`,
+                bk.date   ? `   Date   : ${bk.date}${bk.time ? ' at ' + bk.time : ''}` : '',
+                bk.vehicle || bk.vehicleName ? `   Vehicle: ${bk.vehicleName || bk.vehicle}` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '💰 *PAYMENT BREAKDOWN*',
+                `   Type   : ${paymentType || 'Advance'}`,
+                `   Paid   : ₹${amount || 0}`,
+                `   Total  : ₹${totalFare || 0}`,
+                `   Balance: ₹${balance || 0}`,
+                collectMsg,
+              ].filter(Boolean).join('\n');
 
               await fetch(
                 `https://graph.facebook.com/v21.0/${env.WA_PHONE_NUMBER_ID}/messages`,
@@ -507,6 +560,51 @@ export default {
               results.adminNotified = true;
             }
           } catch (e) { console.error('Payment WA notify error:', e.message); }
+        }
+
+        // ── Customer payment receipt on WhatsApp ─────────────────────────
+        if (phone && env.WA_ACCESS_TOKEN && env.WA_PHONE_NUMBER_ID) {
+          try {
+            const custPayPhone = normalizePhone(phone);
+            if (custPayPhone) {
+              const balanceNote = Number(balance) > 0
+                ? `⏳ Balance ₹${balance} to be paid to driver on trip day`
+                : '✅ Full fare paid — nothing more to pay!';
+              const custPayMsg = [
+                '💳 *Payment Received — BRG CABS*',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                `📋 Booking ID : ${bookingId}`,
+                `👤 Dear ${name || 'Customer'},`,
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '🗺️ *Your Trip*',
+                (bk.pickup || bk.from) ? `   From   : ${bk.pickup || bk.from}` : '',
+                (bk.drop   || bk.to)   ? `   To     : ${bk.drop   || bk.to}`   : '',
+                bk.date    ? `   Date   : ${bk.date}${bk.time ? ' at ' + bk.time : ''}` : '',
+                (bk.vehicleName || bk.vehicle) ? `   Vehicle: ${bk.vehicleName || bk.vehicle}` : '',
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                '💰 *Payment Summary*',
+                `   ${paymentType || 'Advance'}: ₹${amount} received`,
+                `   Total Fare : ₹${totalFare}`,
+                balanceNote,
+                `   Payment ID : ${paymentId}`,
+                '━━━━━━━━━━━━━━━━━━━━━━━',
+                'Our driver details will be shared before your trip.',
+                '📞 Helpline: +91 98114 19926',
+                'Thank you for choosing BRG CABS! 🙏',
+              ].filter(Boolean).join('\n');
+              await fetch(`https://graph.facebook.com/v21.0/${env.WA_PHONE_NUMBER_ID}/messages`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  messaging_product: 'whatsapp',
+                  to: '+' + custPayPhone,
+                  type: 'text',
+                  text: { body: custPayMsg, preview_url: false },
+                }),
+              });
+              results.customerNotified = true;
+            }
+          } catch (e) { console.error('Customer WA payment error:', e.message); }
         }
 
         return json({ success: true, ...results });
