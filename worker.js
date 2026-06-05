@@ -124,7 +124,6 @@ export default {
       //    - Stores in KV with 5-min TTL
       //    - Rate-limited: 1 request per phone per 60s
       //    - Sends via WhatsApp brgcabs_otp template
-      //    - Auto-retries with body-only if button component fails (error 132000)
       // ══════════════════════════════════════════════════════════════════════
       if (path === '/api/otp/send' && request.method === 'POST') {
         const body  = await request.json();
@@ -153,33 +152,21 @@ export default {
           await env.BOOKINGS.put(`otp:${phone}`, otp, { expirationTtl: 300 }).catch(() => {});
         }
 
-        // Component: body + button (with auto-fallback to body-only if needed)
+        // Component: body only (Authentication template with Copy Code button)
         const components = [
           {
             type: 'body',
-            parameters: [{ type: 'text', text: String(otp) }],
-          },
-          {
-            type:       'button',
-            sub_type:   'url',
-            index:      '0',
-            parameters: [{ type: 'text', text: String(otp) }],
-          },
+            parameters: [
+              {
+                type: 'text',
+                text: String(otp)
+              }
+            ]
+          }
         ];
 
         try {
           const waResult = await sendWhatsApp(phone, templateName, langCode, components);
-
-          // Auto-fallback: if URL button is static Meta returns error 132000 — retry body-only
-          if (waResult.error && waResult.error.code === 132000) {
-            console.warn('URL button is static — retrying with body-only component');
-            const fallback = [{ type: 'body', parameters: [{ type: 'text', text: String(otp) }] }];
-            const retry    = await sendWhatsApp(phone, templateName, langCode, fallback);
-            if (retry.error) {
-              return json({ success: false, error: retry.error.message, code: retry.error.code }, 502);
-            }
-            return json({ success: true, message: 'OTP sent via WhatsApp', messageId: retry.messages?.[0]?.id });
-          }
 
           if (waResult.error) {
             console.error('WA OTP error:', JSON.stringify(waResult.error));
