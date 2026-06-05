@@ -987,6 +987,51 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
           <p style="color:var(--gray);font-size:.88rem;margin-bottom:6px;line-height:1.7">Your cab is confirmed. Our team will call you shortly to assign a driver.</p>
           <div class="booking-ref" id="bkRef">BRG-000000</div>
           <div class="bk-sum" id="bkSumFinal" style="text-align:left"></div>
+          <!-- ── PAYMENT OPTIONS PANEL ── -->
+          <div id="payPanel" style="background:#f9f9f9;border:1.5px solid rgba(245,197,24,.35);border-radius:16px;padding:18px 18px 14px;margin:14px 0 10px;text-align:left">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1.5px;color:#0A0A0A;margin-bottom:4px">💳 ONLINE PAYMENT</div>
+            <div style="font-size:.75rem;color:#616161;margin-bottom:14px">Choose how much you'd like to pay now. Balance is collected by the driver.</div>
+
+            <!-- Option pills -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+              <button id="ppOpt10" onclick="selectPayOpt('partial')"
+                style="flex:1;min-width:120px;padding:10px 8px;border-radius:10px;border:2px solid #F5C518;background:#fffbe6;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s;color:#0A0A0A">
+                10% Advance<br><span id="ppAdv10" style="font-size:1rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#D4A017">₹0</span>
+              </button>
+              <button id="ppOptCustom" onclick="selectPayOpt('custom')"
+                style="flex:1;min-width:120px;padding:10px 8px;border-radius:10px;border:2px solid rgba(0,0,0,.12);background:#fff;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s;color:#0A0A0A">
+                Custom Amount<br><span style="font-size:.75rem;color:#616161;font-weight:500">Enter your amount</span>
+              </button>
+              <button id="ppOptFull" onclick="selectPayOpt('full')"
+                style="flex:1;min-width:120px;padding:10px 8px;border-radius:10px;border:2px solid rgba(0,0,0,.12);background:#fff;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s;color:#0A0A0A">
+                Pay Full Fare<br><span id="ppFull" style="font-size:1rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#616161">₹0</span>
+              </button>
+            </div>
+
+            <!-- Custom amount input (hidden until custom selected) -->
+            <div id="ppCustomRow" style="display:none;margin-bottom:12px">
+              <label style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#616161;display:block;margin-bottom:5px">Enter Amount (Min ₹<span id="ppMinLabel">0</span>)</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="font-size:1.1rem;font-weight:800;color:#0A0A0A">₹</span>
+                <input type="number" id="ppCustomAmt" min="0" placeholder="e.g. 2000"
+                  oninput="validateCustomAmt()"
+                  style="flex:1;border:1.5px solid rgba(0,0,0,.15);border-radius:9px;padding:9px 12px;font-size:.95rem;font-weight:700;font-family:'DM Sans',sans-serif;outline:none;color:#0A0A0A"/>
+              </div>
+              <div id="ppCustomErr" style="display:none;font-size:.7rem;color:#EF4444;margin-top:4px"></div>
+            </div>
+
+            <!-- Summary line -->
+            <div id="ppSummary" style="font-size:.8rem;color:#616161;margin-bottom:12px;min-height:18px"></div>
+
+            <!-- Pay button -->
+            <button id="btnPayNow" onclick="triggerRazorpay()"
+              style="width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#D4A017,#F5C518);color:#0A0A0A;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(245,197,24,.35);transition:.2s">
+              PAY NOW
+            </button>
+          </div>
+
+          <!-- Pay status (success / failure) -->
+          <div id="payStatus" style="display:none;text-align:center;padding:10px 0;font-size:.88rem;font-weight:700"></div>
           <button class="btn-wa btn-full" onclick="sendWAConfirm()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Get Confirmation on WhatsApp
@@ -2340,11 +2385,25 @@ function goStep(n){
   document.getElementById('mTitle').textContent = titles[n];
   document.getElementById('mSub').textContent   = subs[n];
   document.getElementById('mBtnBack').style.display = n>1&&n<5 ? '' : 'none';
-  document.getElementById('mBtnNext').style.display = n<4 ? '' : 'none';
+  document.getElementById('mBtnNext').style.display = n<5 ? '' : 'none';
   document.getElementById('mFoot').style.display    = n===5 ? 'none' : '';
   if(n===2) buildCabResults();
   if(n===4) startOTPTimer();
-  const labels = {1:'Search Cabs →',2:'Continue →',3:'Send OTP →',4:'Verify OTP →'};
+  if(n===5){
+    var advEl=document.getElementById('ppAdv10');
+    var fullEl=document.getElementById('ppFull');
+    var minEl=document.getElementById('ppMinLabel');
+    if(advEl)  advEl.textContent ='₹'+(S.advAmt||0).toLocaleString('en-IN');
+    if(fullEl) fullEl.textContent='₹'+(S.totalFare||0).toLocaleString('en-IN');
+    if(minEl)  minEl.textContent =(S.advAmt||0).toLocaleString('en-IN');
+    var payStatus=document.getElementById('payStatus');
+    if(payStatus){ payStatus.style.display='none'; payStatus.textContent=''; }
+    var payPanel=document.getElementById('payPanel');
+    if(payPanel) payPanel.style.display='';
+    // default to 10% advance selected
+    selectPayOpt('partial');
+  }
+  const labels = {1:'Search Cabs →',2:'Continue →',3:'Send OTP →',4:'✅ Verify OTP'};
   if(labels[n]) document.getElementById('mBtnNext').textContent = labels[n];
   document.querySelector('.m-box').scrollTop=0;
 }
@@ -2563,15 +2622,11 @@ function sendOTP(){
     if(el){ el.value=''; el.classList.remove('filled'); }
   });
 
-  // Generate 4-digit OTP client-side
-  const otp = String(Math.floor(1000 + Math.random() * 9000));
-  _otpStore[S.phone] = { otp: otp, expires: Date.now() + 5 * 60 * 1000 };
-
-  // Send OTP via Cloudflare Worker → Meta WhatsApp Business API
+  // OTP is generated SERVER-SIDE by Worker and stored in KV — never on client
   fetch(`${WORKER}/api/otp/send`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: S.phone, otp: otp, name: S.name })
+    body: JSON.stringify({ phone: S.phone, name: S.name })
   })
   .then(r => r.json())
   .then(d => {
@@ -2604,7 +2659,7 @@ function otpBack(e, inp, prevId){
   if(e.key==='Backspace' && !inp.value && prevId) document.getElementById(prevId).focus();
 }
 
-function verifyOTP(){
+async function verifyOTP(){
   const entered = ['o1','o2','o3','o4'].map(id=>document.getElementById(id).value).join('');
   if(entered.length < 4){ toast('⚠️ Please enter the complete 4-digit OTP'); return; }
 
@@ -2612,35 +2667,45 @@ function verifyOTP(){
   const orig = btn.textContent;
   btn.textContent = 'Verifying…'; btn.disabled = true;
 
-  const record = _otpStore[S.phone];
-  if(!record){
-    btn.textContent = orig; btn.disabled = false;
-    toast('⚠️ OTP expired. Please request a new one.');
-    return;
-  }
-  if(Date.now() > record.expires){
-    btn.textContent = orig; btn.disabled = false;
-    delete _otpStore[S.phone];
-    toast('⚠️ OTP expired. Please request a new one.');
-    return;
-  }
-  if(entered === record.otp){
-    delete _otpStore[S.phone];
-    _sessionToken = S.bookingId;
-    btn.textContent = orig; btn.disabled = false;
-    toast('✅ OTP verified!');
-    goStep(5);
-    document.getElementById('bkRef').textContent = S.bookingId;
-    document.getElementById('bkSumFinal').innerHTML = buildSummaryHTML();
-    notifyAdmin();
-  } else {
-    btn.textContent = orig; btn.disabled = false;
-    toast('❌ Wrong OTP. Please try again.');
-    ['o1','o2','o3','o4'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el){ el.value=''; el.classList.remove('filled'); }
+  try {
+    // Verify against KV-stored OTP on the server — cannot be bypassed via DevTools
+    const res  = await fetch(`${WORKER}/api/otp/verify`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ phone: S.phone, otp: entered })
     });
-    document.getElementById('o1').focus();
+    const data = await res.json();
+
+    if(data.success && data.verified){
+      _sessionToken = data.sessionToken || S.bookingId;
+      btn.textContent = orig; btn.disabled = false;
+      toast('✅ OTP verified!');
+      goStep(5);
+      document.getElementById('bkRef').textContent = S.bookingId;
+      document.getElementById('bkSumFinal').innerHTML = buildSummaryHTML();
+      notifyAdmin();
+    } else {
+      btn.textContent = orig; btn.disabled = false;
+      const msg = data.error || 'Invalid OTP';
+      toast('❌ ' + msg);
+      if(msg.toLowerCase().includes('expired')){
+        // Clear inputs so user can request new OTP
+        ['o1','o2','o3','o4'].forEach(id=>{
+          const el = document.getElementById(id);
+          if(el){ el.value=''; el.classList.remove('filled'); }
+        });
+      } else {
+        ['o1','o2','o3','o4'].forEach(id=>{
+          const el = document.getElementById(id);
+          if(el){ el.value=''; el.classList.remove('filled'); }
+        });
+        document.getElementById('o1').focus();
+      }
+    }
+  } catch(err) {
+    btn.textContent = orig; btn.disabled = false;
+    toast('⚠️ Network error verifying OTP — please try again');
+    console.error('verifyOTP error:', err);
   }
 }
 
@@ -3539,22 +3604,18 @@ function cdStep3Next(){
   if(ok){ cdSendOTP(); cdGoStep(4); }
 }
 
-var _cdOtpStore = {}; // { phone: { otp, expires } }
+// Chardham OTP verification is server-side via Worker KV — no client store needed
 
 function cdSendOTP(){
   CD.bookingId='BRG'+Date.now().toString().slice(-6)+Math.random().toString(36).slice(2,5).toUpperCase();
   document.getElementById('cd-otp-num').textContent='+91 '+CD.phone;
   ['cd-o1','cd-o2','cd-o3','cd-o4'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.value=''; el.classList.remove('filled'); }});
 
-  // Generate OTP client-side
-  var otp = String(Math.floor(1000 + Math.random() * 9000));
-  _cdOtpStore[CD.phone] = { otp: otp, expires: Date.now() + 5 * 60 * 1000 };
-
-  // Send OTP via Cloudflare Worker → Meta WhatsApp Business API
+  // OTP generated SERVER-SIDE by Worker and stored in KV — not on client
   fetch(WORKER+'/api/otp/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: CD.phone, otp: otp, name: CD.name })
+    body: JSON.stringify({ phone: CD.phone, name: CD.name })
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
@@ -3584,33 +3645,33 @@ function cdVerifyOTP(){
   var btn=document.getElementById('cdBtnNext'), orig=btn.textContent;
   btn.textContent='Verifying…'; btn.disabled=true;
 
-  var record = _cdOtpStore[CD.phone];
-  if(!record){
+  // Verify against KV-stored OTP on the server — cannot be bypassed via DevTools
+  fetch(WORKER+'/api/otp/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: CD.phone, otp: entered })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.success && data.verified){
+      _cdSessionToken = data.sessionToken || CD.bookingId;
+      btn.textContent=orig; btn.disabled=false;
+      toast('✅ OTP verified!');
+      cdGoStep(5);
+      document.getElementById('cd-bkRef').textContent=CD.bookingId;
+      document.getElementById('cd-bkSumFinal').innerHTML=cdBuildSummary();
+      cdNotifyAdmin();
+    } else {
+      btn.textContent=orig; btn.disabled=false;
+      toast('❌ ' + (data.error || 'Invalid OTP. Please try again.'));
+      ['cd-o1','cd-o2','cd-o3','cd-o4'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.value=''; el.classList.remove('filled'); }});
+      document.getElementById('cd-o1').focus();
+    }
+  })
+  .catch(function(){
     btn.textContent=orig; btn.disabled=false;
-    toast('⚠️ OTP expired. Please request a new one.');
-    return;
-  }
-  if(Date.now() > record.expires){
-    btn.textContent=orig; btn.disabled=false;
-    delete _cdOtpStore[CD.phone];
-    toast('⚠️ OTP expired. Please request a new one.');
-    return;
-  }
-  if(entered === record.otp){
-    delete _cdOtpStore[CD.phone];
-    _cdSessionToken = CD.bookingId;
-    btn.textContent=orig; btn.disabled=false;
-    toast('✅ OTP verified!');
-    cdGoStep(5);
-    document.getElementById('cd-bkRef').textContent=CD.bookingId;
-    document.getElementById('cd-bkSumFinal').innerHTML=cdBuildSummary();
-    cdNotifyAdmin();
-  } else {
-    btn.textContent=orig; btn.disabled=false;
-    toast('❌ Wrong OTP. Please try again.');
-    ['cd-o1','cd-o2','cd-o3','cd-o4'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.value=''; el.classList.remove('filled'); }});
-    document.getElementById('cd-o1').focus();
-  }
+    toast('⚠️ Network error verifying OTP — please try again');
+  });
 }
 
 function cdBuildSummary(){
@@ -3655,10 +3716,273 @@ async function cdNotifyAdmin(){
   fetch(GAS_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(function(){});
 }
 
+
+// ══ RAZORPAY — SECURE SERVER-SIDE ORDER + VERIFY FLOW ══
+// Key is fetched from Cloudflare Worker (env.RAZORPAY_KEY_ID) — never hardcoded here.
+
+// Currently selected payment mode: 'partial' | 'custom' | 'full'
+var _payMode = 'partial';
+
+function _stylePayOpt(selected){
+  var opts = { partial:'ppOpt10', custom:'ppOptCustom', full:'ppOptFull' };
+  Object.keys(opts).forEach(function(k){
+    var el = document.getElementById(opts[k]);
+    if(!el) return;
+    if(k === selected){
+      el.style.borderColor = '#F5C518';
+      el.style.background  = '#fffbe6';
+      el.style.boxShadow   = '0 0 0 3px rgba(245,197,24,.18)';
+    } else {
+      el.style.borderColor = 'rgba(0,0,0,.12)';
+      el.style.background  = '#fff';
+      el.style.boxShadow   = 'none';
+    }
+  });
+}
+
+function selectPayOpt(mode){
+  _payMode = mode;
+  _stylePayOpt(mode);
+  var customRow = document.getElementById('ppCustomRow');
+  var summary   = document.getElementById('ppSummary');
+  var fullAmt   = S.totalFare || 0;
+  var advAmt    = S.advAmt   || 0;
+
+  if(mode === 'partial'){
+    if(customRow) customRow.style.display = 'none';
+    if(summary)   summary.textContent = '10% advance (₹'+advAmt.toLocaleString('en-IN')+') now · Balance ₹'+(fullAmt-advAmt).toLocaleString('en-IN')+' paid to driver';
+  } else if(mode === 'custom'){
+    if(customRow) customRow.style.display = '';
+    var inp = document.getElementById('ppCustomAmt');
+    if(inp) { inp.value = ''; inp.focus(); }
+    if(summary)   summary.textContent = 'Enter any amount ≥ ₹'+advAmt.toLocaleString('en-IN');
+    validateCustomAmt();
+  } else if(mode === 'full'){
+    if(customRow) customRow.style.display = 'none';
+    if(summary)   summary.textContent = 'Full fare ₹'+fullAmt.toLocaleString('en-IN')+' paid online · Nothing due to driver';
+  }
+}
+
+function validateCustomAmt(){
+  var inp  = document.getElementById('ppCustomAmt');
+  var err  = document.getElementById('ppCustomErr');
+  var sum  = document.getElementById('ppSummary');
+  if(!inp) return true;
+  var val     = parseInt(inp.value, 10) || 0;
+  var minAmt  = S.advAmt   || 0;
+  var fullAmt = S.totalFare || 0;
+
+  if(val < minAmt){
+    if(err){ err.style.display=''; err.textContent='Minimum payable is ₹'+minAmt.toLocaleString('en-IN')+' (10% advance)'; }
+    inp.style.borderColor = '#EF4444';
+    if(sum) sum.textContent = '';
+    return false;
+  }
+  if(val > fullAmt){
+    if(err){ err.style.display=''; err.textContent='Amount cannot exceed full fare ₹'+fullAmt.toLocaleString('en-IN'); }
+    inp.style.borderColor = '#EF4444';
+    if(sum) sum.textContent = '';
+    return false;
+  }
+  if(err){ err.style.display='none'; err.textContent=''; }
+  inp.style.borderColor = '#22C55E';
+  var balance = fullAmt - val;
+  if(sum) sum.textContent = '₹'+val.toLocaleString('en-IN')+' paid online'+(balance>0?' · Balance ₹'+balance.toLocaleString('en-IN')+' to driver':'· Full fare covered');
+  return true;
+}
+
+function _getPayAmount(){
+  if(_payMode === 'partial') return S.advAmt || 0;
+  if(_payMode === 'full')    return S.totalFare || 0;
+  // custom
+  var val = parseInt(document.getElementById('ppCustomAmt').value, 10) || 0;
+  return val;
+}
+
+async function triggerRazorpay(){
+  // 1. Validate custom amount if needed
+  if(_payMode === 'custom' && !validateCustomAmt()){ toast('⚠️ Please enter a valid amount'); return; }
+
+  var amount = _getPayAmount();
+  if(!amount || amount < 1){ toast('⚠️ Invalid payment amount'); return; }
+  if(typeof Razorpay === 'undefined'){ toast('⚠️ Payment gateway not loaded — check internet connection'); return; }
+
+  var modeLabel = _payMode === 'full'
+    ? 'Full Payment'
+    : (_payMode === 'custom' ? 'Partial Payment' : '10% Advance');
+
+  // 2. Disable PAY NOW button while creating order
+  var btnPayNow = document.getElementById('btnPayNow');
+  if(btnPayNow){ btnPayNow.disabled = true; btnPayNow.textContent = 'Creating order…'; }
+
+  try {
+    // 3. Create Razorpay order server-side via Cloudflare Worker
+    var orderRes = await fetch(WORKER + '/api/payment/order', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        amount:    amount,
+        bookingId: S.bookingId,
+        notes: {
+          booking_id:   S.bookingId,
+          payment_type: modeLabel,
+          from:         S.pu,
+          to:           S.dr,
+          travel_date:  S.date,
+          vehicle:      S.vehicleName,
+          total_fare:   S.totalFare,
+          name:         S.name,
+          phone:        S.phone
+        }
+      })
+    });
+    var orderData = await orderRes.json();
+
+    if(!orderData.success || !orderData.orderId){
+      toast('❌ Could not create payment order: ' + (orderData.error || 'Please try again'));
+      if(btnPayNow){ btnPayNow.disabled = false; btnPayNow.textContent = 'PAY NOW'; }
+      return;
+    }
+
+    // 4. Open Razorpay checkout using key_id from server + order_id
+    var options = {
+      key:         orderData.key_id,       // live key from Worker env
+      amount:      orderData.amount,        // in paise, confirmed by server
+      currency:    orderData.currency || 'INR',
+      order_id:    orderData.orderId,       // required for signature verification
+      name:        'BRG CABS',
+      description: modeLabel + ' · Booking #' + S.bookingId,
+      image:       'https://www.brgcabs.in/logo.png',
+      prefill: {
+        name:    S.name  || '',
+        email:   S.email || '',
+        contact: '91' + (S.phone || '')
+      },
+      theme: { color: '#F5C518' },
+
+      handler: async function(response){
+        // 5. Verify signature server-side via Worker
+        try {
+          var verifyRes = await fetch(WORKER + '/api/payment/verify', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature
+            })
+          });
+          var verifyData = await verifyRes.json();
+
+          if(!verifyData.success || !verifyData.verified){
+            var payStatus = document.getElementById('payStatus');
+            if(payStatus){
+              payStatus.style.display = '';
+              payStatus.style.color   = '#EF4444';
+              payStatus.textContent   = '⚠️ Payment received but signature verification failed. Please contact support with Payment ID: ' + response.razorpay_payment_id;
+            }
+            toast('⚠️ Verification failed — contact support');
+            return;
+          }
+
+          // 6. Verified ✅ — show success UI
+          var payId   = response.razorpay_payment_id;
+          var balance = (S.totalFare || 0) - amount;
+
+          var payPanel = document.getElementById('payPanel');
+          if(payPanel) payPanel.style.display = 'none';
+
+          var payStatus = document.getElementById('payStatus');
+          if(payStatus){
+            payStatus.style.display = '';
+            payStatus.style.color   = '#22C55E';
+            payStatus.innerHTML =
+              '✅ <strong>₹' + amount.toLocaleString('en-IN') + ' paid successfully!</strong><br>'
+              + '<span style="font-size:.78rem;color:#616161">Payment ID: ' + payId + '</span>'
+              + (balance > 0
+                  ? '<br><span style="font-size:.78rem;color:#616161">Balance ₹' + balance.toLocaleString('en-IN') + ' to be paid to driver</span>'
+                  : '<br><span style="font-size:.78rem;color:#22C55E">Full fare covered ✓</span>');
+          }
+          toast('✅ ₹' + amount.toLocaleString('en-IN') + ' paid & verified!');
+
+          // 7. Notify admin — GAS sheet log + Worker WhatsApp alert
+          var paymentRecord = {
+            bookingId:   S.bookingId,
+            paymentId:   payId,
+            orderId:     response.razorpay_order_id,
+            paymentType: modeLabel,
+            amount:      amount,
+            totalFare:   S.totalFare,
+            balance:     balance,
+            name:        S.name,
+            phone:       S.phone,
+            verified:    true
+          };
+
+          // 7a. GAS Sheet log
+          var params = new URLSearchParams({ action: 'payment', data: JSON.stringify(paymentRecord) });
+          fetch(GAS_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(function(){});
+
+          // 7b. Worker → dedicated payment notify → WhatsApp alert to admin
+          fetch(WORKER + '/api/payment/notify', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              bookingId:   S.bookingId,
+              paymentId:   payId,
+              orderId:     response.razorpay_order_id,
+              paymentType: modeLabel,
+              amount:      amount,
+              totalFare:   S.totalFare,
+              balance:     balance,
+              name:        S.name,
+              phone:       S.phone
+            })
+          }).catch(function(){});
+
+        } catch(verifyErr){
+          toast('⚠️ Verification error — contact support with Payment ID: ' + response.razorpay_payment_id);
+        }
+      },
+
+      modal: {
+        ondismiss: function(){
+          if(btnPayNow){ btnPayNow.disabled = false; btnPayNow.textContent = 'PAY NOW'; }
+          toast('Payment cancelled');
+        }
+      }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(resp){
+      var payStatus = document.getElementById('payStatus');
+      if(payStatus){
+        payStatus.style.display = '';
+        payStatus.style.color   = '#EF4444';
+        payStatus.textContent   = '❌ Payment failed: ' + ((resp.error && resp.error.description) || 'Please try again');
+      }
+      if(btnPayNow){ btnPayNow.disabled = false; btnPayNow.textContent = 'PAY NOW'; }
+      toast('❌ Payment failed. Please try again.');
+    });
+    rzp.open();
+
+    // Re-enable button after Razorpay modal opens
+    if(btnPayNow){ btnPayNow.disabled = false; btnPayNow.textContent = 'PAY NOW'; }
+
+  } catch(err){
+    console.error('Payment error:', err);
+    toast('⚠️ Could not open payment gateway. Please call us to pay.');
+    if(btnPayNow){ btnPayNow.disabled = false; btnPayNow.textContent = 'PAY NOW'; }
+  }
+}
+
+
 function cdSendWAConfirm(){
   var msg=encodeURIComponent('✅ *BRG CABS – Chardham Yatra Confirmed!*\n\n🔖 Booking ID: '+CD.bookingId+'\n👤 '+CD.name+' · +91 '+CD.phone+'\n🛕 Package: '+CD.dhamLabel+'\n🚗 Vehicle: '+CD.vehName+'\n📅 '+CD.date+' at '+CD.time+'\n📍 Pickup: '+CD.pickup+'\n💰 Package Fare: ₹'+CD.totalFare+'\n\nPlease confirm driver. Thank you! 🙏');
   window.open('https://wa.me/'+(typeof ADMIN_WA!=='undefined'?ADMIN_WA:'919811419926')+'?text='+msg,'_blank');
 }
 </script>
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
