@@ -2662,6 +2662,7 @@ function otpBack(e, inp, prevId){
 async function verifyOTP(){
   const entered = ['o1','o2','o3','o4'].map(id=>document.getElementById(id).value).join('');
   if(entered.length < 4){ toast('⚠️ Please enter the complete 4-digit OTP'); return; }
+  if(!S.phone){ toast('⚠️ Session expired — please go back and re-enter your details'); return; }
 
   const btn = document.getElementById('mBtnNext');
   const orig = btn.textContent;
