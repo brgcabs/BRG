@@ -984,7 +984,7 @@ footer{background:#050505;color:rgba(255,255,255,.56);padding:64px 0 0}
         <div class="confirm-wrap">
           <div class="confirm-ic">✓</div>
           <h3 style="font-family:var(--font-h);font-size:1.9rem;letter-spacing:2px;margin-bottom:7px">BOOKING CONFIRMED!</h3>
-          <p style="color:var(--gray);font-size:.88rem;margin-bottom:6px;line-height:1.7">Payment received! Your booking is confirmed. Our team will call you shortly to assign a driver.</p>
+          <p id="bkConfirmMsg" style="color:var(--gray);font-size:.88rem;margin-bottom:6px;line-height:1.7">Your booking is reserved! Please complete payment below to confirm your cab.</p>
           <div class="booking-ref" id="bkRef">BRG-000000</div>
           <div class="bk-sum" id="bkSumFinal" style="text-align:left"></div>
           <!-- ── PAYMENT OPTIONS PANEL ── -->
@@ -2388,7 +2388,7 @@ function goStep(n){
   document.getElementById('mBtnNext').style.display = n<5 ? '' : 'none';
   document.getElementById('mFoot').style.display    = n===5 ? 'none' : '';
   if(n===2) buildCabResults();
-  if(n===4) startOTPTimer();
+  if(n===4){ startOTPTimer(); setTimeout(function(){ var o1=document.getElementById('o1'); if(o1) o1.focus(); }, 150); }
   if(n===5){
     var advEl=document.getElementById('ppAdv10');
     var fullEl=document.getElementById('ppFull');
@@ -3905,6 +3905,8 @@ async function triggerRazorpay(){
                   : '<br><span style="font-size:.78rem;color:#22C55E">Full fare covered ✓</span>');
           }
           toast('✅ ₹' + amount.toLocaleString('en-IN') + ' paid & confirmed!');
+          var bkMsg = document.getElementById('bkConfirmMsg');
+          if(bkMsg) bkMsg.textContent = 'Payment received! Your booking is confirmed. Our team will call you shortly to assign a driver.';
           var confirmWrap = document.querySelector('#mS5 .confirm-wrap');
           if(confirmWrap) setTimeout(function(){ confirmWrap.scrollIntoView({ behavior:'smooth', block:'start' }); }, 300);
 
